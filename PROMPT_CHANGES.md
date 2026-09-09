@@ -1,6 +1,6 @@
 # 提示词改动对照
 
-基准：原 trisoul 提交 `4189f90305e545dbb82654f561fc4d83eed96d03`。原文快照在 [prompt-origin.json](test/fixtures/prompt-origin.json)，新版实际文本在 [prompts.mjs](src/prompts.mjs)、[tools.mjs](src/tools.mjs) 和 [context.mjs](src/context.mjs)。表中“删除”指不迁入新版，不修改原项目。
+基准：原 trisoul 提交 `4189f90305e545dbb82654f561fc4d83eed96d03`。原文快照在 [prompt-origin.json](test/fixtures/prompt-origin.json)，新版实际文本在 [prompts.mjs](src/prompts.mjs)、[dsh-agent.mjs](src/dsh-agent.mjs)、[hub.mjs](src/hub.mjs) 、[tasks.mjs](src/tasks.mjs) 和 [canvas.mjs](src/canvas.mjs)。表中“删除”指不迁入新版，不修改原项目。
 
 原则：保留原句，融合重复职责；删除不适配新架构的要求与事实假设。模型提示词只描述现有能力，不补写“没有某机制”的解释；note 用于按需记录，不承接旧交稿中的思维摘要要求。不以“精简”为由重写仍然适用的行为规则。
 
@@ -22,7 +22,7 @@
 
 | 编号 / 部分 | 原文或原机制 | 新版实际文本 | 为何需要改 |
 | --- | --- | --- | --- |
-| P01 主身份 | 宿主身份 + 每魂 persona | You are trisoul_x. | 独立应用的新名称；行为主体仍来自三官原文。 |
+| P01 主身份 | 宿主身份 + 每魂 persona | You are trisoul_x. | DSH 插件的主执行者名称；行为主体仍来自三官原文。 |
 | P02 原生工具协议 | submit_draft 是唯一交付渠道；直调普通工具会丢弃；动作填执行栏。首版另加：Use native tool calls directly. There are no draft submissions, votes, private lookup tools or execution fields. Working notes are optional; use note when useful, without a required envelope. | 整段删除，不再注入主提示词。 | 旧交付机制已删除，无需再向模型解释它们不存在；可用工具由实际工具定义提供。 |
 | P03 用户回复 | The prose delivered to the user for this step. Empty only when the execution fields carry entries — the executed actions are themselves the output. A submission with nothing queued to execute closes the turn, and this field is then the complete answer: open with the outcome itself — the sentence the user would ask for as the TLDR — then supporting detail; say plainly what remains unverified — never close on an in-progress sentence, and if a check still needs to run, queue it in the execution fields instead; nothing load-bearing may live only in findings. | When you finish the turn, your prose is the complete answer: open with the outcome itself — the sentence the user would ask for as the TLDR — then supporting detail; say plainly what remains unverified — never close on an in-progress sentence, and if a check still needs to run, run it with tools first. | 保留完整回复、结果优先和如实说明验证状态的原句；执行栏改为实际工具执行，删除 findings / 工作笔记与最终回复的旧绑定。 |
 | P04 findings 迁移 | What you newly established this step — what you observed, what the results told you. Written as yourself mid-task, not a reporter summarizing someone else: open on the finding — 'Turns out …', 'Looking at `server.js`, …'. Code entities in backticks; error messages and measured values verbatim. Facts land once, in the step that established them — never retell earlier findings or restate the task. Empty when nothing new has come in yet (e.g. the first step, before any results). Prose only, no lists. | 删除整段，不作为 note 的说明。 | 这是旧交稿的逐步摘要、叙述人称和格式要求；按需工作笔记无需复述每一步观察。 |
@@ -33,14 +33,14 @@
 | P09 后台工具入口 | 旧版通过正文 JSON 提交结果。首版：Commit this maintenance batch once. This records context and memories; it does not perform the user task. | Save this batch’s digest, working state, and memory changes. | 只说明 save_context 实际保存的内容，删除“不执行用户任务”的多余对比。 |
 | P10 状态字段 | STATE_FORMAT 开头的 JSON 强制句与示例对象 | 移除这两行；pin/status 的增量、全量与代谢规则原文迁入后台 system 和字段描述。 | 字段说明需要继续被模型读到，但不再要求正文套 JSON。 |
 | P11 历史回捞参数 | call trisoul_recall with {"query":"what you need","seqRange":{"start":lo,"end":hi}} | call recall with {"query":"what you need","from":lo,"to":hi} | 对应新版工具名称与扁平参数；工作记录头另有 P23 修正。 |
-| P12 read.limit | Maximum number of lines to return. Defaults to ${caps.limit}. | Maximum number of lines to return. Omit to read to the end. | 新版没有宿主默认读取截断；传 limit 才限制行数。 |
-| P13 bash 工具 | 原 bashDescription 的执行说明 + DSH 环境变量、沙箱、截断落盘、后台作业与升级授权说明。 | Execute a bash command (`bash -c`) and return its stdout/stderr. Each call runs in a fresh shell: no state (cwd, variables, functions) persists between calls — pass `workdir` instead of using `cd`. Non-zero exits are reported as `[exit code: N]`. | 前三句逐字保留。宿主沙箱、环境注入、输出截断和后台任务服务未迁入，相关说明必须删除。 |
-| P14 tasks 接口 | task_map 的节选/锚点/op 操作 + todo 的完成态操作。 | A clear, complete todo list greatly raises the completion rate in medium-to-large tasks. Use it when the task takes three or more distinct steps, when the user lists several things at once, or when new instructions arrive mid-task — capture them right away. Skip it for single-step work and plain conversation — a list there is overhead, not help. Supply the complete current list in items. Decide how a task will be verified before building it, and check it off the moment it is fully done — one at a time, as you go, not all of them at the end. Never check off a task while its tests are failing, the implementation is partial, or an error on it is unresolved; when several are checked together, that must hold for every one of them. Uncheck a task that turns out not to be done. Remove a task only when it no longer belongs on the list — irrelevant, impossible, or overtaken by newer instructions — never because it is hard; say why in your reply. | 合成一个按需清单工具。保留触发时机、完成标记与如实维护的原句；结构操作改为 items 全量清单，draft 改 reply。 |
-| P15 web_fetch | Fetch the content of a specific HTTP(S) URL and return it decoded to text. + 独立 system 中的引用要求。 | Fetch the content of a specific HTTP(S) URL and return it decoded to text. Cite the URL as a markdown link when you use its content. | 原 description 加原 system 中 Cite the URL… 句，融合到一个工具说明。没有改写原句。 |
-| P16 recall | 原 trisoul_recall 的两通道说明全文 | Search your long-term memory, or retrieve the verbatim text behind a condensed work record. (1) Recall: pass query (natural language) to get related memories (scoped to what this project can see: global + cross-project + this project); optionally narrow with scope. (2) Retrieve originals: condensed records in the context are tagged with "seq a..b" — when you need the original content that was condensed away, pass {from:a,to:b} to get the raw event text of that span verbatim (no model rewriting). | 原句保留，只把 seqRange:{start:a,end:b} 改成 {from:a,to:b}；工具名改为 recall。 |
-| P17 环境块 | envBlock(): Working directory / Platform / Today | 三个标签与原语义保留，目录与日期取新会话。 | 新项目独立运行，不能继续使用原 profile 的目录或路由。 |
+| P12 read.limit | 原宿主：Maximum number of lines to return. Defaults to ${caps.limit}. 首版独立原型改为 Omit to read to the end. | 恢复 DSH 原生参数描述与实际读取上限：Maximum number of lines to return. Defaults to ${caps.limit}. | 文件读取已交回 DSH，描述随宿主实际配置生成。 |
+| P13 bash 工具 | 首版只留下执行命令、全新 shell、workdir 与退出码说明。 | 恢复 DSH 原生 `tool:bash` system 段和 bash schema，包括环境、超时、输出落盘与后台作业说明。 | 对应宿主已经提供的真实能力；不再维护简化版命令执行器。 |
+| P14 任务工具 | 原 task_map 定义与锚点、todo 完成标记、verify_link 验证关联分为三个工具；独立原型先合为 tasks(items)。 | 一个 `todo_write(todos)`：每条记录有 content、status、可选 source、verification.method / result。任务原文纪律与验证原文融合到同一工具说明。 | 任务定义、进展和验证属于同一条记录；去掉跨工具关联与转交，细项见 P33–P36。 |
+| P15 web_fetch | 首版把 Fetch the content… 与 Cite the URL… 合成 description。 | 恢复 DSH 的 web_fetch 工具说明与独立 `tool:web-fetch` system 段；web_search 由宿主同时注册。 | 原先的分层指导恢复，网页格式转换、检索与引用说明跟随真实宿主工具。 |
+| P16 recall | 原 trisoul_recall 的两通道说明；范围固定写 global + cross-project + this project，回捞用 seqRange。 | 原句主体保留；范围改为 scoped to this session’s selected memory range；原文参数改为 {from:a,to:b}，工具名 recall。scope 参数的 everything visible to this project 改为 everything visible to this session。 | 支持用户在输入区选择的三种记忆范围，不能再承诺每个会话都有全局记忆；参数对齐新工具。 |
+| P17 环境与项目指令 | 首版只有 Working directory / Platform / Today 三行。 | 恢复 DSH 环境、时间、项目指令、技能目录及运行时上下文层。 | 原型缺少的通用能力由宿主提供；当前目录、日期和项目指令根据会话生成。 |
 | P18 用户语言 | 原软路线 output 纪律：respond in the user's language | Respond in the user's language. | 从被删除的交稿纪律迁到主提示词。 |
-| P19 文件工具指导的摆放 | 原宿主 tool:read / tool:write / tool:edit 的独立 system 段 | 合入对应工具 description；read 指导逐字保留，write/edit 只删 P20 所列括号 | 新版没有宿主提示词注册服务，指导仍需完整送达模型。 |
+| P19 文件工具指导的摆放 | 原宿主 tool:read / tool:write / tool:edit 独立 system 段；首版合入 description。 | 恢复原生工具 schema + 独立 system 段；write/edit 仅删 P20 的括号。 | 恢复 trisoul 原有分层，实际读写能力复用 DSH。 |
 | P20 文件操作的宿主政策指代 | (the default fs-observation-policy requires it) | 删除这个括号，保留“先读取已有文件”“优先定点修改”等其余原句 | 该宿主政策未迁入，不能继续声称代码有此硬要求；不增加检查闸门。 |
 | P21 自主执行的交互假设 | The user is not watching in real time and cannot answer questions mid-task, so asking 'Want me to…?' or 'Shall I…?' will block the work. | 删除这一句，其余自主执行规则保留。 | 当前对话和工具结果实时显示；是否自主行动取决于任务授权，不需要假定用户无法观看。 |
 | P22 记忆整理作业指代 | duplication is acceptable (the curation job cleans it up), wrongful merging is not | duplication is acceptable, wrongful merging is not | 独立 curation 作业未迁入，不能承诺后续自动清理；宁重复勿误并等原规则保留。 |
@@ -58,15 +58,15 @@
 | D06 | tipsMessage：parallel timelines / never delivered | 删除。 | 不存在未执行的败者时间线。 |
 | D07 | toolClassesHint、officerHint、DEDICATED_BLURBS | 删除工具阶层与官位排他说明；知识查证原则保留在博识原文。 | 所有主模型工具走同一循环。 |
 | D08 | ENVELOPE_DESC.action：固定 -ing 当前动作句 | 删除独立动作栏格式要求。 | 没有独立 action/move 栏；不是改写自然回复风格。 |
-| D09 | verify_link 描述、I4 未完成弹回、I6 文字复核、I7 证据分型旁白 | 不迁入。 | 按最小化要求，不建立强制验证与收官闸门；实证行为原句仍保留。 |
-| D10 | TODO_NUDGE / TODO_EMPTY_NUDGE | 不再按官位自动注入；任务使用场景保留在 tasks 工具原文。 | 没有对齐官专属提醒；减少每步机制消息。 |
+| D09 | verify_link 独立操作、I4 未完成弹回、I6 文字复核、I7 证据分型旁白 | 删除独立验证工具和程序收官闸门；验证方法与证据质量原文迁入统一任务工具。 | 用户要求把验证合入任务；证据记录与任务状态一起维护。 |
+| D10 | TODO_NUDGE / TODO_EMPTY_NUDGE | 不注入官位专属提醒；原任务使用场景与完成标准并入 todo_write 的 description。 | 对齐官已融合为主执行者，清单由宿主提供。 |
 | D11 | CURATE_RULES / CURATE_FORMAT_TAIL 与 signals.overlap/conflict | 不迁入独立周期整理作业；删除未使用的 overlap/conflict 文案常量；OPS_DESC 中旧作业指代按 P22 删除。 | 现有消化作业维护条目，保留同一件事更新、宁重复勿误并等规则。 |
 | D12 | DIGEST_DESC.workdoc | 不迁入独立任务补注文档视图，并删除未使用的文案常量；当前工作状态由 status 维护。 | 避免同时维护两份重叠的会话工作状态。 |
 | D13 | DIGEST_DESC.phaseClosed | 不迁入整段阶段放行信号，并删除未使用的文案常量；compactable / nowCompactable 原文保留。 | 按区间释放即可，不增加另一个放行通道。 |
 | D14 | 记忆 LLM picker：Output JSON only {indexes:[…]} | 删除，recall 采用本地文本匹配。 | 保留原文回捞与分层记忆，避免每次召回再调用模型。 |
 | D15 | ASK_SYSTEM / ASK_FORMAT / ANSWER_SYSTEM：压缩探针出题、作答、判分 | 不迁入。 | 按最小化要求不加自动验证流程；原文永远保留，仍能按序号回捞。 |
 | D16 | 任务补注的 renew/rewrite/append 三种专属头与独立工作文档 | 不迁入多路线；保留开场记忆注入与状态快照追加。 | 去掉并行维护的视图和历史兼容分支。 |
-| D17 | 宿主工具提示中的 fs-observation-policy / sandbox_permissions / justification | 不迁入对应机制说明与参数。 | 新项目不装宿主安全门和升级审批；常规 read/write/edit 描述及实际参数保留。 |
+| D17 | fs-observation-policy 的强制先读提示与宿主权限说明 | 禁用 fs-observation-policy，并仅从 tool:write / tool:edit 删除该政策括号。DSH 的运行环境与权限上下文按实际配置生成，默认完整访问、审批 never。 | 插件不新增产品闸门；宿主原生工具与设置保持一致。 |
 
 ## 保持原文的后台与工具部分
 
@@ -78,10 +78,47 @@
 | STATE_SYSTEM 两区定义与 Discipline | 除 P07 首句外逐字保留，包括恒真区 append-only。 |
 | STATE_FORMAT 的 pin/status、代谢、语言与原文引用规则 | 除 JSON 外壳外逐字保留。 |
 | 手术刀 system | 全文逐字保留 Done / Errors / Decisions / Not yet done 与原先的英文、引用纪律；合并原检查点的说明保留。 |
-| 长期记忆开场头、工作状态版本头 | 原句保留，变量改取新存储。 |
-| read/write/edit description 与文件参数名 | 原描述、file_path/content/offset/old_string/new_string/replace_all 保留；limit 默认说明的变化见 P12。 |
-| tasks 的完成标准 | 原 todo 的真实完成、失败不得勾选、发现未完成要取消勾选等原句保留；没有把它实现成硬闸门。 |
+| 长期记忆开场头、工作状态版本头 | 原句主体保留；开场层级按已选范围显示，状态带实际事件序号。 |
+| read/write/edit | DSH 当前工具 schema 与独立提示层；只删除失效政策括号（P20）。 |
+| todo_write 的完成标准 | 原 todo 的真实完成、失败不得勾选、发现未完成要取消勾选等原句保留；没有把它实现成硬闸门。 |
+
+## 本轮 DSH 适配补充
+
+宿主基准：DSH `0.1.5-alpha.1`，提交 `5dda764ed3aa172535a7967b06ff95d9cbfe536a`。插件使用该版本的 standard Agent preset 为底稿。以下是与独立原型相比的恢复与适配，不再往主提示词中添加“某机制不存在”的解释。
+
+| 编号 / 部分 | 适配前 | 现在 | 原因 |
+| --- | --- | --- | --- |
+| P24 身份层 | 自己拼接一份 system 字符串 | `trisoul-x:persona`：身份 + 三官融合原文 + REPLY_GUIDE + 用户语言；由 DSH 注册和排序 | 恢复原分层；正文不再另写。 |
+| P25 通用工具层 | 8 个自写工具，部分说明合并 | DSH 原生文件、搜索、Shell、后台作业、技能、目标、用户提问、网页、按需子代理与工作流；插件提供 note、recall 和融合后的 todo_write | 通用执行复用 DSH；任务工具扩展为任务与验证的统一记录。 |
+| P26 工具层中的失效括号 | DSH 默认 write/edit 仍提到已禁用的 fs-observation-policy | 组装时仅删除 ` (the default fs-observation-policy requires it)`，其余原生段落保持 | 延续 P20，避免向模型陈述不存在的强制行为。 |
+| P27 按需子代理 | 独立原型未实现 | 恢复 DSH 的 subagent / subagent_fork / 查询、等待、发送与停止工具及原生说明 | 用户明确选择“保留，按需调用”；无固定三模型编队。 |
+| P28 技能与项目上下文 | 独立原型未加载 | DSH 的 agent-instructions、skill-filesystem、tool-skill 按会话加载 | 原 trisoul 通用能力的一部分，不能以简化为由漏掉。 |
+| P29 动态记忆头 | 固定写 global / cross-project / project | 全量时保留原层级；项目或会话模式显示已选范围和实际所属标识，其余记忆头原句保持 | 与输入区选择保持一致。 |
+| P30 后台输入 | 读取自写 JSONL 的消息 | 读取 DSH 事件原文：seq、事件类型、工具名称与参数、结果、约束、状态、记忆和待复审区间 | 调整数据来源；MEMORY_CONSTITUTION / STATE_RULES / SURGEON_SYSTEM 不改。 |
+| P31 检查点与回捞 | 自己重建发送历史 | DSH V3 surface 原位替换；记录头保留 seq 回捞信息、已完成/未完成语义 | DSH 持久化和轨迹能够直接理解整理事件。 |
+| P32 计划模式 | 独立原型无模式切换 | 使用 DSH preset 中的 plan-mode 原文，仅在用户进入计划模式时生效 | 复用宿主已有选择能力，不增加默认执行闸门。 |
+
+| 编号 / 部分 | 原文 / 旧机制 | 新文 / 处理 | 原因 |
+| --- | --- | --- | --- |
+| P33 需求锚点 | Creates and edits the todo list anchored to the user's own wording；excerpt、anchor 的 from/to 和 msg；单独 op:transcript/view | 保留首句与原任务使用纪律；`source` 保存相关用户原话，直接随任务记录一起提交 | 用户原始消息仍在 DSH 会话中；取消独立摘录表与跨表锚点，用同一任务中的原话保留需求依据。 |
+| P34 验证时机 | When to link: link the evidence the moment a task is done — not in one sweep after everything is built. | When to record: record the verification result the moment a task is done — not in one sweep after everything is built. | 证据写回当前任务的 verification.result；仅把独立“关联”动作改成任务内记录。 |
+| P35 验证纪律 | How a test earns its place…、What does not count… 两段；Evidence ranks… | 前两段逐字保留。证据层级段只改 Link the highest rung → Record the highest rung，reason must say why → the result must say why，其余原文保持 | 保留从需求推导验证、真实路径、证据质量与如实说明的原则；适配新的存储字段。 |
+| P36 验证工具协议 | A task counts as verified only through what is linked here；独立 op:link/run/unlink/view、自动按文件扩展名执行测试 | 删除独立关联协议与“只有经过此工具才算验证”的定义。新增接口说明：Send the complete list in todos. Each task carries its own status, source wording, and verification method/result. Run checks with the available execution tools and record their observed results on the same task. When a task changes, update its status and verification to match the revised task. | 一个任务工具统一更新；执行仍用普通工具；验证未记录时页面如实显示，不设置自动拒绝完成或另一个验证循环。 |
+
+## 现在的组成
+
+| 层 | 来源与职责 |
+| --- | --- |
+| 主身份与行为 | 三官原文融合 + 完整回复纪律 + 用户语言 |
+| 通用 system 段 | DSH 工具使用指导、环境与能力；任务和验证纪律合入统一 todo_write 工具 |
+| 项目与技能 | DSH 按当前目录和会话发现、加载 |
+| 动态上下文 | 用户选定范围内的记忆、工作状态、用户消息和工具结果 |
+| 工具 schema | DSH 原生工具 + note / recall + 含验证字段的 todo_write |
+| 记忆与状态后台 | 原记忆宪法 + 两区规则 + save_context 工具 |
+| 上下文整理后台 | 原手术刀提示词，输出普通文字工作纪要 |
 
 ## 核验
 
-自动测试对照原文快照，检查主提示词的保留段落（仅扣除 P21）、记忆宪法、OPS_DESC（仅扣除 P22）和手术刀全文。首版已通过真实模型调用验证自然语言、原生工具和后台提交；本轮提示词清理运行现有回归测试，不重复调用付费 API。原文快照仅供对照与测试，不参与运行时加载。
+自动测试对照原文快照检查主提示词、TASK_GUIDE 原任务纪律、TASK_VERIFY_GUIDE 原验证纪律、记忆宪法、OPS_DESC 和手术刀原文；使用真实 DSH 加载插件、原生工具和本地模型端点，验证自然语言输出、项目指令、技能目录、记忆注入、范围绑定、V3 整理与回捞、任务与验证同一记录及跨轮恢复。原文快照仅用于对照测试，不参与运行时加载。
+
+使用用户授权的 DeepSeek v4 flash 进行了真实文件读写、技能加载、按需子代理与后台记忆联调。联网搜索需要另行配置宿主搜索提供方；本轮未把 Ark 模型密钥当作搜索凭据。
