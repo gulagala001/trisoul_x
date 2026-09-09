@@ -6,6 +6,8 @@
 
 当前任务结构：todo_write 负责需求、任务和完成状态，verify_link 独立负责验证；二者共用任务数据和页面。下表保留迁移与审核过程，涉及验证合入 todo_write 的旧处理由本轮 P47–P50 覆盖。
 
+用户随后要求恢复三类动态收尾提醒，当前已按 P51–P54 接回单模型回合结束流程。
+
 ## 三官融合：保留哪些原句
 
 | 编号 | 原文位置 | 新版处理 | 原因 |
@@ -15,7 +17,7 @@
 | M03 | 三官 When you have enough information to act… 段 | 选博识完整段，含共同句和 Note the difference… 补充，原句不改。 | 一位执行者不必重复三次同一组行动规则；知识核实补充保留。 |
 | M04 | 三官 You are operating autonomously… 段 | 选博识完整段，逐字保留，包括用户不在场的假设和 Gathering missing information… 补充。 | 融合重复；按用户逐段核对意见保留原自主执行设定。 |
 | M05 | 三官 Exception: when the user is describing a problem… 段 | 先保留对齐完整段，再追加博识、实证各自的独有尾句，逐字保留。 | 咨询时只交付评估，以及评估须标明证据与推测，三者合并。 |
-| M06 | 三官 Before ending your turn… 段 | 保留对齐完整段；再追加实证的 "Complete" means verified… 原句。 | 保留完成范围与真实验证的行为标准；不实现程序收官闸门。 |
+| M06 | 三官 Before ending your turn… 段 | 保留对齐完整段；再追加实证的 "Complete" means verified… 原句。 | 保留完成范围与真实验证的行为标准；原任务收尾提醒现按 P51–P54 恢复。 |
 | M07 | 三官 Before running a command that changes system state… 段 | 采用对齐／实证共同版本；删除博识官的扩写，具体原文见 P37。 | 2026-09-09 用户逐段核对后要求删除该补充。 |
 | M08 | 三官 For actions that are hard to reverse… 段 | 选实证完整段，保留原授权边界、诚实报告及 verified 定义。 | 保留已有提示词，未新增安全门、审批系统或验证工具。 |
 | M09 | 每魂的身份与工具分配 | 改为一个主模型共享普通工具；不再注入魂名与专属官位工具块。 | 多魂和私有取证循环已经移除。 |
@@ -60,7 +62,7 @@
 | D06 | tipsMessage：parallel timelines / never delivered | 删除。 | 不存在未执行的败者时间线。 |
 | D07 | toolClassesHint、officerHint、DEDICATED_BLURBS | 删除工具阶层与官位排他说明；知识查证原则保留在博识原文。 | 所有主模型工具走同一循环。 |
 | D08 | ENVELOPE_DESC.action：固定 -ing 当前动作句 | 删除独立动作栏格式要求。 | 没有独立 action/move 栏；不是改写自然回复风格。 |
-| D09 | verify_link 独立入口、I4 收官弹回、I6 追问与I7旁白 | 验证操作与描述已恢复并合入 todo_write；完成态与证据分类保留，未恢复投票/独走收官流程。 | 保留原任务验证能力，适配单主模型运行方式。 |
+| D09 | verify_link 独立入口、I4 收官弹回、I6 追问与I7旁白 | verify_link 按 P47–P50 独立；I4 两种任务提醒和 I6 文字证据复核按 P51–P54 恢复。多魂投票、独走调度与 I7 固定收官旁白未迁入。 | 按用户最新要求恢复收尾提醒及其实际触发；调度适配单主模型。 |
 | D10 | TODO_NUDGE / TODO_EMPTY_NUDGE | 恢复原文软提醒，面向单主模型；空清单提醒里的 task_map 改成 todo_write。 | 保留新指令更新任务、复杂任务漏建清单的提醒；仅适配工具名和调用对象。 |
 | D11 | CURATE_RULES / CURATE_FORMAT_TAIL 与 signals.overlap/conflict | 不迁入独立周期整理作业；删除未使用的 overlap/conflict 文案常量；OPS_DESC 中旧作业指代按 P22 删除。 | 现有消化作业维护条目，保留同一件事更新、宁重复勿误并等规则。 |
 | D12 | DIGEST_DESC.workdoc | 不迁入独立任务补注文档视图，并删除未使用的文案常量；当前工作状态由 status 维护。 | 避免同时维护两份重叠的会话工作状态。 |
@@ -135,7 +137,18 @@
 | P49 查看说明 | op:view returns the full todo list including excerpts, with every task's completion state and evidence. | todo_write：op:view returns the full todo list including excerpts.；verify_link：op:view returns every task with its completion state and evidence. | 恢复两个工具各自的原文查看说明和回执；任务视图显示需求与锚点，验证视图显示任务状态与证据。页面仍使用同一份记录，在任务下显示证据。 |
 | P50 参数与入口 | todo_write 同时接受任务与验证 op；tasks 接受对象或 ID，ids 同时表示任务 ID 和证据 ID。 | todo_write 的 op 为 excerpt/add/edit/remove/check/view/transcript；tasks 恢复原任务对象数组与原描述，ids 恢复 Required for remove: ids of the tasks to delete。verify_link 的 op 为 link/run/unlink/view，完整参数 schema 恢复原版，包括独立的 links、运行目标 tasks 和撤销链接 ids。 | 消除同一工具中的参数复用；保留 P42/P46 的统一任务删除入口，工具共享队列以保持编辑任务时清除旧验证的联动。 |
 
-任务部分的主动简化已撤回，验证入口按上表独立。记忆整理、任务补注文档、阶段结束信号和语义检索中此前的删减仍列在 D11–D16，尚未逐段审定；它们是当前实现与原版的差异，不应把“最小化”当作用户已经认可这些删减的理由。后续按同一原则逐段核对。
+## 本轮恢复：动态任务收尾提醒
+
+用户审核删除项后要求“这几个加回来吧”。以下三类提示使用原版文本；动态任务条目、证据状态和 reason 引用也保留原格式。
+
+| 编号 / 部分 | 原文 / 原行为 | 当前处理 | 原因 |
+| --- | --- | --- | --- |
+| P51 未完成任务 | [todo list] Unresolved tasks remain:，随后列出未完成或缺证据的任务及缺口 | 原文恢复；主模型正常收尾时，存在未勾选任务就把提示送入下一步并继续本回合。 | 恢复用户要求的未完成任务提醒，直接由同一个主模型处理。 |
+| P52 勾选但证据不足 | [todo list] Every task is checked off, but these lack qualifying evidence:，随后列出缺口；末句 Link real evidence, or uncheck what is not actually done. | 原文恢复；任务均已勾选、但仍有任务缺少合格链接时触发。合格条件沿用原版：test 需实际运行通过，text 需已关联。 | 完成勾选之后仍须对照实际关联的验证证据。 |
+| P53 文字证据复核 | [todo list] Tasks whose only evidence is a text record:；逐项引回 note 与 your reason no higher rung was runnable；尾句 Re-check each reason against what is actually available here. If a higher rung is runnable after all, build and link it; if not, they stay as they are. | 原文恢复；全部任务已完成并有合格证据后，对仅有文字证据且尚未问过的链接触发一次复核。 | 恢复对“为什么无法使用更强证据”的再次核对。 |
+| P54 调度与复核记录 | 原来由多魂收官流程派发提醒，复核成功后将文字链接标成 asked；编辑清除、撤销重挂后重新复核。 | 接入 DSH agent/turn-stopping，通过原生 steering 继续同一回合；成功回应后静默保存已提示链接的 asked。失败、中断、未送达不算复核；复核期间新挂的链接仍待复核。计划模式和子代理不触发主任务收尾提醒。 | 保留原任务语义，适配单模型正常收尾；复核状态可跨进程恢复，保持编辑与验证的联动。 |
+
+任务部分的主动简化已撤回，验证入口独立，三类收尾提醒已恢复。记忆整理、任务补注文档、阶段结束信号和语义检索中此前的删减仍列在 D11–D16，尚未逐段审定；它们是当前实现与原版的差异，不应把“最小化”当作用户已经认可这些删减的理由。后续按同一原则逐段核对。
 
 ## 现在的组成
 
@@ -144,7 +157,7 @@
 | 主身份与行为 | 三官原文融合（含用户逐段核对的调整）+ 用户语言 |
 | 通用 system 段 | DSH 使用指导与环境；原 task_map、todo 描述融合，verify_link 独立保留原文 |
 | 项目与技能 | DSH 按当前目录和会话发现、加载 |
-| 动态上下文 | 用户选定范围内的记忆、工作状态、用户消息和工具结果 |
+| 动态上下文 | 用户选定范围内的记忆、工作状态、用户消息、工具结果，以及恢复的三类任务收尾提醒 |
 | 工具 schema | DSH 原生工具 + note/recall + todo_write + verify_link |
 | 记忆与状态后台 | 原记忆宪法 + 两区规则 + save_context 工具 |
 | 上下文整理后台 | 原手术刀提示词，输出普通文字工作纪要 |
@@ -154,3 +167,5 @@
 自动测试对照原文快照检查主提示词、任务工具中保留的摘录/锚点/完整完成纪律、verify_link 全文、记忆宪法、OPS_DESC 和手术刀原文；本轮提示词归属与接口见 P47–P50。使用真实 DSH 加载插件、原生工具和本地模型端点，验证自然语言输出、项目指令、技能目录、记忆注入、范围绑定、V3 整理与回捞、任务与验证同一记录及跨轮恢复。任务测试验证两个工具的独立调用、统一任务删除入口、各自的查看结果及验证运行时编辑任务的联动。原文快照仅用于对照测试，不参与运行时加载。
 
 使用用户授权的 DeepSeek v4 flash 进行了真实文件读写、技能加载、按需子代理与后台记忆联调。联网搜索需要另行配置宿主搜索提供方；本轮未把 Ark 模型密钥当作搜索凭据。
+
+收尾提醒恢复通过真实 DSH 的回合循环验证：本地模型端点分别在任务未完成、已勾选但无证据、仅文字证据时尝试结束；三类原文均实际进入下一次模型请求，复核成功后不重复追问。另覆盖静默持久化、重新挂接、新旧链接区分、写入失败、取消和计划模式；随后执行真实测试命令并验证跨轮证据恢复。
