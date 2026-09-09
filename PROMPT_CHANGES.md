@@ -6,7 +6,7 @@
 
 当前任务结构：todo_write 负责需求、任务和完成状态，verify_link 独立负责验证；二者共用任务数据和页面。下表保留迁移与审核过程，涉及验证合入 todo_write 的旧处理由本轮 P47–P50 覆盖。
 
-用户随后要求恢复三类动态收尾提醒，当前已按 P51–P54 接回单模型回合结束流程。
+用户随后要求恢复三类动态收尾提醒，当前已按 P51–P54 接回单模型回合结束流程。2026-09-10 又要求恢复全部与三魂无关的机制，并重构相关设置；最终处理见 P59–P70，覆盖此前的融合与删减。用户明确审定的 output、findings/plan/action、故障类比补充删改仍有效，命令安全门仍沿用先前排除要求。
 
 ## 三官融合：保留哪些原句
 
@@ -32,9 +32,9 @@
 | P04 findings 迁移 | What you newly established this step — what you observed, what the results told you. Written as yourself mid-task, not a reporter summarizing someone else: open on the finding — 'Turns out …', 'Looking at `server.js`, …'. Code entities in backticks; error messages and measured values verbatim. Facts land once, in the step that established them — never retell earlier findings or restate the task. Empty when nothing new has come in yet (e.g. the first step, before any results). Prose only, no lists. | 删除整段，不作为 note 的说明。 | 这是旧交稿的逐步摘要、叙述人称和格式要求；按需工作笔记无需复述每一步观察。 |
 | P05 plan 迁移 | How you'll proceed after this step, at whatever depth you've actually thought it through — when you've already settled the design, write it out in full, key code included: thinking not recorded here is gone when the step ends. No need to re-paste code that ships in files/edits this step. Only what you newly settled or changed; empty when the plan you already recorded still stands — never pad. | 删除整段，不作为 note 的说明。 | 原生会话保留上下文，不再要求每步重述思考和方案；原 files/edits 字段指代也随整段删除。 |
 | P06 工作笔记入口 | 四格 findings、plan 每步交稿。首版入口：Save a working note when useful; this is optional, not a delivery channel. 参数：The working note, in ordinary prose | Save a useful fact, decision, or unfinished plan for later work. 参数 text：Note content | 仅说明笔记可以保存什么；去掉交付渠道对比、每步摘要和文体限制。 |
-| P07 后台身份融合 | You are the canvas scribe, maintaining the two zones of the current session's working context (session-scoped only; cross-session long-term facts belong to the memory hub — do not duplicate them):<br>- Pinned truths: hard constraints from the user's own words, explicitly settled decisions, key facts that must not be violated. Append-only, one fact per entry, short sentences, each understandable on its own.<br>- Status: a snapshot of the current task's plan / progress / conclusions, rewritten wholesale each time, concise.<br>Discipline: when unsure, keep it out of the pinned zone; process noise stays out of the status zone. | In this same job, also maintain the two zones of the current session's working context (session-scoped only; cross-session long-term facts belong to the memory hub — do not duplicate them):<br>- Pinned truths: hard constraints from the user's own words, explicitly settled decisions, key facts that must not be violated. Append-only, one fact per entry, short sentences, each understandable on its own.<br>- Status: a snapshot of the current task's plan / progress / conclusions, rewritten wholesale each time, concise.<br>Discipline: when unsure, keep it out of the pinned zone; process noise stays out of the status zone. | 记忆与工作状态由同一次后台调用处理，只改开头身份连接句；两区定义与纪律完整保留。 |
+| P07 后台身份融合 | You are the canvas scribe, maintaining the two zones of the current session's working context…；完整两区定义、Discipline 见 STATE_SYSTEM 原文快照。 | 原 STATE_SYSTEM 全文逐字恢复；状态作业独立使用 save_state，记忆消化仅使用记忆宪法与 save_context。 | 撤回首版 In this same job, also maintain 的融合；恢复原版独立状态提炼、游标、失败冷却和快照换代。 |
 | P08 后台交付协议 | Output JSON (JSON only) + 正文 JSON 骨架 | Submit the result using save_context. | 取消整篇 JSON 格式锁和正文解析；正常工具调用的参数仍结构化。 |
-| P09 后台工具入口 | 旧版通过正文 JSON 提交结果。首版：Commit this maintenance batch once. This records context and memories; it does not perform the user task. | Save this batch’s digest, working state, and memory changes. | 只说明 save_context 实际保存的内容，删除“不执行用户任务”的多余对比。 |
+| P09 后台工具入口 | 旧版通过正文 JSON 提交结果。 | Save this batch’s digest, task memo rewrite, and memory changes. | save_context 恢复任务记忆文档改写，pin/status 移回独立 save_state；只描述实际保存内容。 |
 | P10 状态字段 | STATE_FORMAT 开头的 JSON 强制句与示例对象 | 移除这两行；pin/status 的增量、全量与代谢规则原文迁入后台 system 和字段描述。 | 字段说明需要继续被模型读到，但不再要求正文套 JSON。 |
 | P11 历史回捞参数 | call trisoul_recall with {"query":"what you need","seqRange":{"start":lo,"end":hi}} | call recall with {"query":"what you need","from":lo,"to":hi} | 对应新版工具名称与扁平参数；工作记录头另有 P23 修正。 |
 | P12 read.limit | 原宿主：Maximum number of lines to return. Defaults to ${caps.limit}. 首版独立原型改为 Omit to read to the end. | 恢复 DSH 原生参数描述与实际读取上限：Maximum number of lines to return. Defaults to ${caps.limit}. | 文件读取已交回 DSH，描述随宿主实际配置生成。 |
@@ -62,14 +62,14 @@
 | D06 | tipsMessage：parallel timelines / never delivered | 删除。 | 不存在未执行的败者时间线。 |
 | D07 | toolClassesHint、officerHint、DEDICATED_BLURBS | 删除工具阶层与官位排他说明；知识查证原则保留在博识原文。 | 所有主模型工具走同一循环。 |
 | D08 | ENVELOPE_DESC.action：固定 -ing 当前动作句 | 删除独立动作栏格式要求。 | 没有独立 action/move 栏；不是改写自然回复风格。 |
-| D09 | verify_link 独立入口、I4 收官弹回、I6 追问与I7旁白 | verify_link 按 P47–P50 独立；I4 两种任务提醒和 I6 文字证据复核按 P51–P54 恢复。多魂投票、独走调度与 I7 固定收官旁白未迁入。 | 按用户最新要求恢复收尾提醒及其实际触发；调度适配单主模型。 |
+| D09 | verify_link 独立入口、I4 收官弹回、I6 追问与 I7 旁白 | verify_link、两类收尾提醒和文字证据复核已恢复；I7 的完成/测试型/文字型统计恢复到用户面板。 | 单模型通过宿主 steering 继续执行，收尾统计直接给用户看；多魂独走与投票调度移除。 |
 | D10 | TODO_NUDGE / TODO_EMPTY_NUDGE | 恢复原文软提醒，面向单主模型；空清单提醒里的 task_map 改成 todo_write。 | 保留新指令更新任务、复杂任务漏建清单的提醒；仅适配工具名和调用对象。 |
-| D11 | CURATE_RULES / CURATE_FORMAT_TAIL 与 signals.overlap/conflict | 整理规则和两个信号原文已恢复；memory_curate 原生工具替代正文 JSON 格式锁，信号和实际变更触发整理。原分片轮巡等调度与当前实现的剩余差异见 P58。 | 按用户要求恢复原句和信号，并接通其依赖的整理能力。 |
-| D12 | DIGEST_DESC.workdoc | 不迁入独立任务补注文档视图，并删除未使用的文案常量；当前工作状态由 status 维护。 | 避免同时维护两份重叠的会话工作状态。 |
-| D13 | DIGEST_DESC.phaseClosed | 不迁入整段阶段放行信号，并删除未使用的文案常量；compactable / nowCompactable 原文保留。 | 按区间释放即可，不增加另一个放行通道。 |
-| D14 | 记忆 LLM picker：Output JSON only {indexes:[…]} | 删除，recall 采用本地文本匹配。 | 保留原文回捞与分层记忆，避免每次召回再调用模型。 |
-| D15 | ASK_SYSTEM / ASK_FORMAT / ANSWER_SYSTEM：压缩探针出题、作答、判分 | 不迁入。 | 按最小化要求不加自动验证流程；原文永远保留，仍能按序号回捞。 |
-| D16 | 任务补注的 renew/rewrite/append 三种专属头与独立工作文档 | 不迁入多路线；保留开场记忆注入与状态快照追加。 | 去掉并行维护的视图和历史兼容分支。 |
+| D11 | CURATE_RULES / CURATE_FORMAT_TAIL 与 signals.overlap/conflict | 规则和信号原文恢复；原生 memory_curate 提交。分片轮巡、游标、晋升候选和使用信号已接回，见 P58/P66。 | 恢复原能力，适配单模型、DSH V3 与所选记忆范围。 |
+| D12 | DIGEST_DESC.workdoc | 全文逐字恢复到 save_context.workdoc；同批消化代谢任务记忆文档。 | 撤回将任务知识文档与进度 status 视作重复的删减。 |
+| D13 | DIGEST_DESC.phaseClosed | 全文逐字恢复；阶段结束放行此前批次及未覆盖的过程区间。 | 恢复原版整段阶段放行能力。 |
+| D14 | 记忆 LLM picker | 语义挑选恢复，select_memories 原生工具承接 indexes；调用失败才用原本的本地词匹配。 | 正文 JSON 协议改为原生工具，其余检索行为恢复。 |
+| D15 | ASK_SYSTEM / ASK_FORMAT / ANSWER_SYSTEM | 出题、作答、判分与补记全部恢复；出题使用 record_probe，作答输出普通文本。 | 压缩事实探针属于信息保留机制，恢复原文与原判分；不恢复正文 JSON 锁。 |
+| D16 | 任务补注 renew/rewrite/append 与独立工作文档 | 三种方式、原版消息头、版本节流、开场/首次任务/主动/压缩重注均恢复。 | 撤回首版过度简化；DSH V3 替换接口与跨进程记录按新宿主适配。 |
 | D17 | fs-observation-policy 的强制先读提示与宿主权限说明 | 禁用 fs-observation-policy，并仅从 tool:write / tool:edit 删除该政策括号。DSH 的运行环境与权限上下文按实际配置生成，默认完整访问、审批 never。 | 插件不新增产品闸门；宿主原生工具与设置保持一致。 |
 
 ## 保持原文的后台与工具部分
@@ -79,7 +79,7 @@
 | 记忆 CONSTITUTION | 全文逐字保留（稳定事实、原因、日期、少记、避免过程信息）。 |
 | OPS_DESC 全部 6 个字段 | 包括 P22 的整理说明在内，全文逐字保留；工具参数仍是 add/update/retire、scope、key、text、target。 |
 | DIGEST_DESC.digest / compactable / nowCompactable | 逐字保留。nowCompactable 的 id 从旧字符串改为本地事件整数序号，说明语义不变。 |
-| STATE_SYSTEM 两区定义与 Discipline | 除 P07 首句外逐字保留，包括恒真区 append-only。 |
+| STATE_SYSTEM 全文 | 已逐字恢复，状态提炼与记忆消化独立。 |
 | STATE_FORMAT 的 pin/status、代谢、语言与原文引用规则 | 除 JSON 外壳外逐字保留。 |
 | 手术刀 system | 全文逐字保留 Done / Errors / Decisions / Not yet done 与原先的英文、引用纪律；合并原检查点的说明保留。 |
 | 长期记忆开场头、工作状态版本头 | 原句主体保留；开场层级按已选范围显示，状态带实际事件序号。 |
@@ -157,9 +157,26 @@
 | P55 重复记忆的后续处理 | duplication is acceptable (the curation job cleans it up), wrongful merging is not | 整句逐字恢复，OPS_DESC 六个字段均与原版一致。 | 整理作业已实际接回。 |
 | P56 整理信号 | overlap: the existing memories contain duplicate / near-duplicate entries about the same matter (informs the curation job); false when uncertain；conflict: existing memories contradict each other or the new events (informs the curation job); false when uncertain | 两条描述逐字恢复到 save_context.signals 的布尔字段中；signals 及两字段必填。 | 消化作业报告重复和冲突，原生工具参数承接结构化结果。 |
 | P57 整理规则与提交协议 | CURATE_RULES 整段；CURATE_FORMAT_TAIL 的 Output JSON only 和字段说明 | CURATE_RULES 整段逐字恢复；字段说明进入 memory_curate 原生工具参数。增加工具说明 Save the memory curation operations. 和提交指引 Submit the result using memory_curate.。记忆宪法原文保留。 | 保留去重、合并、退役、范围调整、使用信号参考和语言要求，按 x 架构提交后台操作。 |
-| P58 调度、输入与记录 | 修改/退役已有记忆或 overlap/conflict 触发项目分片整理，默认最短间隔 180000ms；原版另有全库空闲轮巡、分片游标和跨项目晋升候选。 | 信号与实际已有记忆变更触发整理，默认间隔沿用 180000ms，重复请求合并；当前按会话已选范围整批提供候选，附原要求的年龄、更新时间、注入/召回、来源和版本深度。恢复用户来源、退役原因、版本和使用记录；失败保留待整理标记，继续会话时重试。监控单列 curation，复用后台模型配置。 | 让恢复的提示词对应可执行能力，并适配当前存储和三档记忆范围。原版全库空闲轮巡、分页游标与跨项目晋升候选尚未迁入，保留为后续审核差异。 |
+| P58 调度、输入与记录 | 修改/退役已有记忆或 overlap/conflict 触发项目分片整理；空闲轮巡、分片游标、跨项目晋升候选与使用信号。 | 全部恢复：global / cross / project 分片、默认 180000ms 最短间隔、空闲与可选批次触发、片内窗口和持久游标、跨项目相同 key / 近似文本候选。项目分片公共摘要只读，会话私有层不参与长期整理；记录来源、版本与用量。 | 适配新存储与会话选定范围；取代上一版将可见层级整批混合处理的简化实现。 |
 
-任务部分的主动简化已撤回，验证入口独立，三类收尾提醒已恢复；本轮记忆整理原句、信号和对应作业已接回。P58 的剩余整理调度差异，以及 D12–D16 的任务补注文档、阶段结束信号和语义检索等删减，仍待后续逐段核对。
+任务部分的主动简化已撤回，验证入口独立，三类收尾提醒已恢复。P58 与 D12–D16 的剩余通用机制均已接回；以下记录本次恢复所需的提示词接口变化。
+
+## 本轮全面恢复：非三魂机制与设置
+
+| 编号 / 部分 | 原文 / 原行为 | 新版实际文本 / 处理 | 原因 |
+| --- | --- | --- | --- |
+| P59 独立状态作业 | STATE_SYSTEM 与 STATE_FORMAT 的 pin/status、代谢和原文引用规则。 | STATE_SYSTEM 全文原样使用；STATE_RULES 逐字保留 JSON 外壳以外内容；新增 Save the new pinned truths and the complete status snapshot. / Submit the result using save_state. | 恢复独立状态流程，仅把正文 JSON 提交改为原生工具。记忆和其他插件注入不进入状态提炼输入。 |
+| P60 任务记忆文档 | only when a "current task memo document" was given above: the full rewritten document, in English — its metabolic rewrite: fold the entries under "— new items (to fold in) —" into the body, merge same-topic knowledge into one place, fix what new events overturned, delete what's obsolete or no longer relevant; fine details need not be copied in full (the store has them all, retrievable at any time). Organize only, never invent: add no fact the document doesn't contain. Empty string if no document was given or no change is needed. | 描述逐字恢复到 workdoc 参数；输入标题仅将 rewrite rules under workdoc in the output format 改为 rewrite rules under workdoc in the tool parameters。 | 同一次消化整理文档，规则文本不改；“字段说明所在位置”随原生工具适配。异步返回时只改写它实际看过的版本。 |
+| P61 阶段结束 | whether this batch marks the close of a phase (a chunk of work finished / a conclusion reached / a deliverable written and verified) — if so, all earlier process text can be condensed wholesale; when unsure fill false | 描述逐字恢复到 phaseClosed；与 compactable / nowCompactable 一起供画布选择区间。 | 恢复阶段收尾整段放行，同时保持最新状态、任务和默认用户原话的保留规则。 |
+| P62 语义检索 | You are the memory retriever. Given the question (and the session's current state background), pick the relevant memory entries from the numbered candidates — better too few than too many. 后接正文 JSON 格式要求。 | 前句逐字恢复；末句改为 Submit the selected indexes using select_memories.；工具说明 Select the relevant memory entries.，indexes 说明 Indexes of relevant entries; an empty array if nothing is relevant. | 恢复语义选择与状态背景，结果通过工具编号提交。首次任务、主动补注与 recall 共用挑选器，故障时词匹配回退。 |
+| P63 补注消息 | 原 SUPPLEMENT_HEAD、SUPPLEMENT_HEAD_RENEW、— new items (to fold in) —。 | 三项逐字恢复；开场头的层级按会话选择呈现。renew 按版本追加、rewrite 原位替换、append 逐批追加，默认开场不限、每批 8 条、最多 4 次、首次等待 8 秒、版本至少间隔 10 步。 | 文本沿用原版；分层范围、V3 startSeq/endSeq 和持久状态适配。范围入口仍在输入区左侧。 |
+| P64 探针出题与作答 | 原 ASK_SYSTEM、ANSWER_SYSTEM；原 ASK_FORMAT 的 question/expected 和作答 JSON 外壳。 | 两份 system 原文逐字恢复；出题新增 Submit the question and reference answer using record_probe. 与 Record one factual question and its reference answer.；question 为 The question，expected 为 The reference answer (as short as possible)。作答按原 ANSWER_SYSTEM 输出答案或 UNKNOWN。 | 取消正文 JSON 外壳，保留一题事实探针、参考答案和仅依据纪要作答的纪律。原归一化与数字边界判分原样迁移。 |
+| P65 压缩底稿与补记 | Pre-condensed draft from the memory hub (usable as a base; the original text above remains authoritative):；Addendum (verified facts earlier records missed; preserve each verbatim in the record):；[Addendum · key facts from the condensed span] | 三段原文恢复。底稿作为参考和过长输出的备选；探针遗漏默认随下一次压缩写入，qa/material 可立即补入。按原 judgeProbe 核对事实真正保留后才清除待补条目。 | 原文与补记语义不改。立即补记改为完整 V3 compaction 生命周期；待补内容保存到会话状态，重启可续。 |
+| P66 分片整理输入 | 原 Current shard、Editable entries、公共只读摘要、Promotion candidates 与年龄/来源/版本/使用信息。 | 分片和候选说明沿用原句；使用字段映射为 x 的 at / previous / usage；项目级会话不读取范围外公共摘要，会话私有记忆不参与晋升。 | 恢复全局、跨项目、项目轮巡，接口与范围选择相匹配。 |
+| P67 快照与压缩机制 | 最新状态/任务保留，旧快照不进入纪要原料；最新任务记忆文档可压缩；旧检查点合并；可选旧用户消息退役、过期快照清理；状态与压缩失败冷却。 | 行为恢复。V3 禁止 assistant/message 携带替换来源，因此过期快照使用空 system/message 替换：宿主从请求中省略它，带有效回合/步骤并可重载；不新增任何模型可见文案。 | 必要的 DSH V3 适配。强制手动整理也跳过仅有插件提示或单个旧纪要的空刀。 |
+| P68 收尾统计 | I7 用户可见：完成数、测试型任务数、仅文字型任务数。 | 相同统计进入任务面板的“最近收尾”，不注入模型消息。 | 原多魂旁白渠道拆除，单模型版本通过自己的 UI 展示结果。 |
+| P69 设置与用量 | 原统一/分别模型设置、off 能力判断、压缩频率、记忆范围、后台批次和上限。 | 后台可统一或按记忆/状态与探针/压缩分别配置。恢复 3/10000/6、6/20000/10、10/40000/15 三档及自定义；补注、轮巡、状态、探针、可选长度与超时均实际接线并热更新。主执行模型和普通工具设置由 DSH 管理。 | 保留通用参数，去掉魂数、投票、交稿、格式锁等设置。后台超时仍能退出无视 AbortSignal 的挂起流。 |
+| P70 监控与记忆页面 | 原组件轨迹、上下文演变、输入区统计、记忆使用/版本/健康信息。 | 改为主执行、按需子代理、消化、检索、状态、整理、压缩和探针；补回轨迹、上下文历史与缓存显示、任务记忆文档、待补事实、收尾统计、分片状态和版本永久删除。 | 重构为单模型 UI；原有编辑/退役/恢复/搜索/范围选择保留。历史上下文图从本次升级后的请求开始积累，不伪造过去的帧。 |
 
 ## 现在的组成
 
@@ -168,11 +185,14 @@
 | 主身份与行为 | 三官原文融合（含用户逐段核对的调整）+ 用户语言 |
 | 通用 system 段 | DSH 使用指导与环境；原 task_map、todo 描述融合，verify_link 独立保留原文 |
 | 项目与技能 | DSH 按当前目录和会话发现、加载 |
-| 动态上下文 | 用户选定范围内的记忆、工作状态、用户消息、工具结果，以及恢复的三类任务收尾提醒 |
+| 动态上下文 | 开场记忆、任务记忆文档、独立工作状态、任务快照、用户消息和工具结果，以及三类收尾提醒 |
 | 工具 schema | DSH 原生工具 + note/recall + todo_write + verify_link |
-| 记忆与状态后台 | 原记忆宪法 + 两区规则 + save_context 工具 |
-| 记忆整理后台 | 原记忆宪法 + CURATE_RULES 全文 + memory_curate 工具；由信号或已有记忆变更触发 |
-| 上下文整理后台 | 原手术刀提示词，输出普通文字工作纪要 |
+| 记忆消化后台 | 原记忆宪法 + save_context（含 workdoc、phaseClosed、signals） |
+| 状态提炼后台 | 原 STATE_SYSTEM + STATE_RULES + save_state |
+| 记忆检索后台 | 原 PICK_SYSTEM 主体 + select_memories；状态背景与编号候选 |
+| 记忆整理后台 | 原记忆宪法 + CURATE_RULES 全文 + memory_curate 工具；信号、实际变更、空闲轮巡及可选批次触发 |
+| 上下文整理后台 | 原手术刀提示词、预压缩底稿与待补记，输出普通文字工作纪要 |
+| 压缩探针后台 | 原出题与作答 system，record_probe + 普通答案；判分与补记 |
 
 ## 核验
 
@@ -183,3 +203,5 @@
 收尾提醒恢复通过真实 DSH 的回合循环验证：本地模型端点分别在任务未完成、已勾选但无证据、仅文字证据时尝试结束；三类原文均实际进入下一次模型请求，复核成功后不重复追问。另覆盖静默持久化、重新挂接、新旧链接区分、写入失败、取消和计划模式；随后执行真实测试命令并验证跨轮证据恢复。
 
 记忆整理恢复通过真实 DSH 与本地模型端点联调：save_context 返回 overlap 后自动请求 memory_curate，并实际退役预置重复记忆。针对性测试覆盖原文一致性、合并与历史、false/conflict 信号、实际更新触发、记忆范围、最短间隔、并发用户编辑、用户来源继承、层级移动、失败及取消。
+
+本次全面恢复验证：41 项自动测试全部通过，包含真实 DSH profile 与本地确定性模型端点；实际覆盖设置热更新、独立状态、语义检索、任务记忆文档换代、V3 旧快照清理、压缩探针、原文回捞、任务收尾统计和记忆管理 API。针对性测试另覆盖跨项目晋升/私有范围排除、分片游标续转、空闲尾批、状态降级、挂起流超时、底稿替代、探针事实消账，以及手动 QA 补记不嵌套维护操作。3083 的设置、任务上下文、记忆、监控与输入区统计已通过页面验证，前端无错误日志。测试使用隔离目录；原 trisoul 未改动。
