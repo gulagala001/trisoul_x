@@ -4,6 +4,8 @@
 
 原则：尽量保持原版，保留原句与通用能力；只融合职责并调整架构不兼容的协议，以及用户逐段审定的改动。模型提示词只描述现有能力，不补写“没有某机制”的解释；note 用于按需记录，不承接旧交稿中的思维摘要要求。不以“精简”为由重写仍然适用的行为规则。
 
+当前任务结构：todo_write 负责需求、任务和完成状态，verify_link 独立负责验证；二者共用任务数据和页面。下表保留迁移与审核过程，涉及验证合入 todo_write 的旧处理由本轮 P47–P50 覆盖。
+
 ## 三官融合：保留哪些原句
 
 | 编号 | 原文位置 | 新版处理 | 原因 |
@@ -80,7 +82,7 @@
 | 手术刀 system | 全文逐字保留 Done / Errors / Decisions / Not yet done 与原先的英文、引用纪律；合并原检查点的说明保留。 |
 | 长期记忆开场头、工作状态版本头 | 原句主体保留；开场层级按已选范围显示，状态带实际事件序号。 |
 | read/write/edit | DSH 当前工具 schema 与独立提示层；只删除失效政策括号（P20）。 |
-| todo_write 的完成标准 | 原完成条件和取消勾选规则逐字保留；完成时机与挂证据时机按 P43 融合，删除规则按 P42 合并。编辑任务仍自动取消勾选并清除验证链接。 |
+| todo_write 的完成标准 | 原完成时机、完成条件和取消勾选规则逐字保留；删除规则按 P42 合并。挂证据时机按 P48 归回 verify_link；编辑任务仍自动取消勾选并清除验证链接。 |
 
 ## 本轮 DSH 适配补充
 
@@ -122,22 +124,33 @@
 | P45 查看结果 | op:view returns the full todo list including excerpts.<br>op:view returns every task with its completion state and evidence. | op:view returns the full todo list including excerpts, with every task's completion state and evidence. | 统一为一条 view 说明；实际回执将证据放在各任务下面，每个任务显示一次，同时保留摘录、锚点、勾选、证据 ID、命令、运行状态和文字证据原因。原 transcript 说明逐字保留，移到同一查看段。 |
 | P46 删除入口和参数 | check 的 remove: Task ids to delete from the list entirely；op:remove 的 ids: Required for remove: ids of the tasks to delete。updates: Each entry is {"id": task id, "done": true or false} | 删除统一使用 op:remove + ids；移除 check 的 remove 参数和执行分支。updates 改为 Required for check: each entry is {"id": task id, "done": true or false}。其余摘录、锚点、证据参数保持前一版。 | 去掉模型可选择的重复删除入口；完成态只接收 updates，三份旧工具 schema/注册定义合成一份实际定义。原事件数据与稳定 ID 不变。 |
 
-本轮已撤回任务部分的主动简化。记忆整理、任务补注文档、阶段结束信号和语义检索中此前的删减仍列在 D11–D16，尚未逐段审定；它们是当前实现与原版的差异，不应把“最小化”当作用户已经认可这些删减的理由。后续按同一原则逐段核对。
+## 本轮调整：验证工具独立
+
+用户提出“验证还是得拆出来”，因此保留 task_map 与 todo 的融合，将 verify_link 恢复为主模型可直接调用的普通工具。存储、任务与证据关联、页面和按会话串行操作继续共用。
+
+| 编号 / 部分 | 调整前 | 新版实际文本 / 处理 | 原因 |
+| --- | --- | --- | --- |
+| P47 验证提示词归属 | 验证的 How a test earns its place、What does not count、Evidence ranks 和 link/run/unlink 说明放在 todo_write，独立工具介绍按 P41 删除。 | 从 todo_write 移出验证说明，verify_link 的 description 全文逐字恢复原 trisoul，包括 The tasks' verification-link tool, used to raise the real completion rate of the todo list. A task counts as verified only through what is linked here. 和完整的时机、验证纪律、证据等级、操作说明。 | 验证重新拥有独立工具，原介绍句重新适用；原全文无需再做融合改写。 |
+| P48 完成时机 | Decide how a task will be verified before building it, and link the evidence and check it off the moment it is fully done — one at a time, as you go, not all of them at the end. | todo_write 恢复 Decide how a task will be verified before building it, and check it off the moment it is fully done — one at a time, as you go, not all of them at the end.；verify_link 恢复 When to link: link the evidence the moment a task is done — not in one sweep after everything is built. | 完成标记与挂证据分别属于两个工具；撤回 P43 的合句。验证判定句随 P47 归回验证工具，未删除任何完成或验证要求。 |
+| P49 查看说明 | op:view returns the full todo list including excerpts, with every task's completion state and evidence. | todo_write：op:view returns the full todo list including excerpts.；verify_link：op:view returns every task with its completion state and evidence. | 恢复两个工具各自的原文查看说明和回执；任务视图显示需求与锚点，验证视图显示任务状态与证据。页面仍使用同一份记录，在任务下显示证据。 |
+| P50 参数与入口 | todo_write 同时接受任务与验证 op；tasks 接受对象或 ID，ids 同时表示任务 ID 和证据 ID。 | todo_write 的 op 为 excerpt/add/edit/remove/check/view/transcript；tasks 恢复原任务对象数组与原描述，ids 恢复 Required for remove: ids of the tasks to delete。verify_link 的 op 为 link/run/unlink/view，完整参数 schema 恢复原版，包括独立的 links、运行目标 tasks 和撤销链接 ids。 | 消除同一工具中的参数复用；保留 P42/P46 的统一任务删除入口，工具共享队列以保持编辑任务时清除旧验证的联动。 |
+
+任务部分的主动简化已撤回，验证入口按上表独立。记忆整理、任务补注文档、阶段结束信号和语义检索中此前的删减仍列在 D11–D16，尚未逐段审定；它们是当前实现与原版的差异，不应把“最小化”当作用户已经认可这些删减的理由。后续按同一原则逐段核对。
 
 ## 现在的组成
 
 | 层 | 来源与职责 |
 | --- | --- |
 | 主身份与行为 | 三官原文融合（含用户逐段核对的调整）+ 用户语言 |
-| 通用 system 段 | DSH 使用指导与环境；原 task_map、todo、verify_link 描述合并到统一任务工具 |
+| 通用 system 段 | DSH 使用指导与环境；原 task_map、todo 描述融合，verify_link 独立保留原文 |
 | 项目与技能 | DSH 按当前目录和会话发现、加载 |
 | 动态上下文 | 用户选定范围内的记忆、工作状态、用户消息和工具结果 |
-| 工具 schema | DSH 原生工具 + note/recall + 原任务/验证操作合并后的 todo_write |
+| 工具 schema | DSH 原生工具 + note/recall + todo_write + verify_link |
 | 记忆与状态后台 | 原记忆宪法 + 两区规则 + save_context 工具 |
 | 上下文整理后台 | 原手术刀提示词，输出普通文字工作纪要 |
 
 ## 核验
 
-自动测试对照原文快照检查主提示词、任务工具中保留的摘录/锚点/完成条件/验证规则、记忆宪法、OPS_DESC 和手术刀原文；任务介绍、删除、时机和 view 的已审定融合见 P41–P46。使用真实 DSH 加载插件、原生工具和本地模型端点，验证自然语言输出、项目指令、技能目录、记忆注入、范围绑定、V3 整理与回捞、任务与验证同一记录及跨轮恢复。任务测试验证统一删除入口及每项任务下的证据展示。原文快照仅用于对照测试，不参与运行时加载。
+自动测试对照原文快照检查主提示词、任务工具中保留的摘录/锚点/完整完成纪律、verify_link 全文、记忆宪法、OPS_DESC 和手术刀原文；本轮提示词归属与接口见 P47–P50。使用真实 DSH 加载插件、原生工具和本地模型端点，验证自然语言输出、项目指令、技能目录、记忆注入、范围绑定、V3 整理与回捞、任务与验证同一记录及跨轮恢复。任务测试验证两个工具的独立调用、统一任务删除入口、各自的查看结果及验证运行时编辑任务的联动。原文快照仅用于对照测试，不参与运行时加载。
 
 使用用户授权的 DeepSeek v4 flash 进行了真实文件读写、技能加载、按需子代理与后台记忆联调。联网搜索需要另行配置宿主搜索提供方；本轮未把 Ark 模型密钥当作搜索凭据。
