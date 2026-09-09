@@ -47,7 +47,7 @@
 | P19 文件工具指导的摆放 | 原宿主 tool:read / tool:write / tool:edit 独立 system 段；首版合入 description。 | 恢复原生工具 schema + 独立 system 段；write/edit 仅删 P20 的括号。 | 恢复 trisoul 原有分层，实际读写能力复用 DSH。 |
 | P20 文件操作的宿主政策指代 | (the default fs-observation-policy requires it) | 删除这个括号，保留“先读取已有文件”“优先定点修改”等其余原句 | 该宿主政策未迁入，不能继续声称代码有此硬要求；不增加检查闸门。 |
 | P21 自主执行的交互假设 | The user is not watching in real time and cannot answer questions mid-task, so asking 'Want me to…?' or 'Shall I…?' will block the work. | 原文恢复，放在 You are operating autonomously. 之后。 | 2026-09-09 用户逐段核对时明确要求保留；撤回此前基于界面实时交互能力作出的删除。 |
-| P22 记忆整理作业指代 | duplication is acceptable (the curation job cleans it up), wrongful merging is not | duplication is acceptable, wrongful merging is not | 独立 curation 作业未迁入，不能承诺后续自动清理；宁重复勿误并等原规则保留。 |
+| P22 记忆整理作业指代 | duplication is acceptable (the curation job cleans it up), wrongful merging is not | 按用户审核意见，括号原文已恢复，OPS_DESC 全文重新与原版一致。 | 对应整理作业已接回，见 P55–P58。 |
 | P23 工作记录恢复说明 | treat it as done and continue; don't redo or restate it. | continue from the recorded progress and carry forward unfinished work. | 压缩记录本来就包含 Not yet done，不能笼统地把整份记录都当成已完成。 |
 
 ## 因删除旧机制而不再发送的提示词
@@ -64,7 +64,7 @@
 | D08 | ENVELOPE_DESC.action：固定 -ing 当前动作句 | 删除独立动作栏格式要求。 | 没有独立 action/move 栏；不是改写自然回复风格。 |
 | D09 | verify_link 独立入口、I4 收官弹回、I6 追问与I7旁白 | verify_link 按 P47–P50 独立；I4 两种任务提醒和 I6 文字证据复核按 P51–P54 恢复。多魂投票、独走调度与 I7 固定收官旁白未迁入。 | 按用户最新要求恢复收尾提醒及其实际触发；调度适配单主模型。 |
 | D10 | TODO_NUDGE / TODO_EMPTY_NUDGE | 恢复原文软提醒，面向单主模型；空清单提醒里的 task_map 改成 todo_write。 | 保留新指令更新任务、复杂任务漏建清单的提醒；仅适配工具名和调用对象。 |
-| D11 | CURATE_RULES / CURATE_FORMAT_TAIL 与 signals.overlap/conflict | 不迁入独立周期整理作业；删除未使用的 overlap/conflict 文案常量；OPS_DESC 中旧作业指代按 P22 删除。 | 现有消化作业维护条目，保留同一件事更新、宁重复勿误并等规则。 |
+| D11 | CURATE_RULES / CURATE_FORMAT_TAIL 与 signals.overlap/conflict | 整理规则和两个信号原文已恢复；memory_curate 原生工具替代正文 JSON 格式锁，信号和实际变更触发整理。原分片轮巡等调度与当前实现的剩余差异见 P58。 | 按用户要求恢复原句和信号，并接通其依赖的整理能力。 |
 | D12 | DIGEST_DESC.workdoc | 不迁入独立任务补注文档视图，并删除未使用的文案常量；当前工作状态由 status 维护。 | 避免同时维护两份重叠的会话工作状态。 |
 | D13 | DIGEST_DESC.phaseClosed | 不迁入整段阶段放行信号，并删除未使用的文案常量；compactable / nowCompactable 原文保留。 | 按区间释放即可，不增加另一个放行通道。 |
 | D14 | 记忆 LLM picker：Output JSON only {indexes:[…]} | 删除，recall 采用本地文本匹配。 | 保留原文回捞与分层记忆，避免每次召回再调用模型。 |
@@ -77,7 +77,7 @@
 | 部分 | 处理 |
 | --- | --- |
 | 记忆 CONSTITUTION | 全文逐字保留（稳定事实、原因、日期、少记、避免过程信息）。 |
-| OPS_DESC 全部 6 个字段 | 除 P22 所列旧作业括号外逐字保留；工具参数仍是 add/update/retire、scope、key、text、target。 |
+| OPS_DESC 全部 6 个字段 | 包括 P22 的整理说明在内，全文逐字保留；工具参数仍是 add/update/retire、scope、key、text、target。 |
 | DIGEST_DESC.digest / compactable / nowCompactable | 逐字保留。nowCompactable 的 id 从旧字符串改为本地事件整数序号，说明语义不变。 |
 | STATE_SYSTEM 两区定义与 Discipline | 除 P07 首句外逐字保留，包括恒真区 append-only。 |
 | STATE_FORMAT 的 pin/status、代谢、语言与原文引用规则 | 除 JSON 外壳外逐字保留。 |
@@ -148,7 +148,18 @@
 | P53 文字证据复核 | [todo list] Tasks whose only evidence is a text record:；逐项引回 note 与 your reason no higher rung was runnable；尾句 Re-check each reason against what is actually available here. If a higher rung is runnable after all, build and link it; if not, they stay as they are. | 原文恢复；全部任务已完成并有合格证据后，对仅有文字证据且尚未问过的链接触发一次复核。 | 恢复对“为什么无法使用更强证据”的再次核对。 |
 | P54 调度与复核记录 | 原来由多魂收官流程派发提醒，复核成功后将文字链接标成 asked；编辑清除、撤销重挂后重新复核。 | 接入 DSH agent/turn-stopping，通过原生 steering 继续同一回合；成功回应后静默保存已提示链接的 asked。失败、中断、未送达不算复核；复核期间新挂的链接仍待复核。计划模式和子代理不触发主任务收尾提醒。 | 保留原任务语义，适配单模型正常收尾；复核状态可跨进程恢复，保持编辑与验证的联动。 |
 
-任务部分的主动简化已撤回，验证入口独立，三类收尾提醒已恢复。记忆整理、任务补注文档、阶段结束信号和语义检索中此前的删减仍列在 D11–D16，尚未逐段审定；它们是当前实现与原版的差异，不应把“最小化”当作用户已经认可这些删减的理由。后续按同一原则逐段核对。
+## 本轮恢复：记忆整理原句与触发信号
+
+用户要求“上一句和这一部分你都去恢复了”，指 P22 括号和 signals.overlap/conflict。它们已连同对应整理作业恢复。
+
+| 编号 / 部分 | 原文 / 旧机制 | 当前处理 | 原因 |
+| --- | --- | --- | --- |
+| P55 重复记忆的后续处理 | duplication is acceptable (the curation job cleans it up), wrongful merging is not | 整句逐字恢复，OPS_DESC 六个字段均与原版一致。 | 整理作业已实际接回。 |
+| P56 整理信号 | overlap: the existing memories contain duplicate / near-duplicate entries about the same matter (informs the curation job); false when uncertain；conflict: existing memories contradict each other or the new events (informs the curation job); false when uncertain | 两条描述逐字恢复到 save_context.signals 的布尔字段中；signals 及两字段必填。 | 消化作业报告重复和冲突，原生工具参数承接结构化结果。 |
+| P57 整理规则与提交协议 | CURATE_RULES 整段；CURATE_FORMAT_TAIL 的 Output JSON only 和字段说明 | CURATE_RULES 整段逐字恢复；字段说明进入 memory_curate 原生工具参数。增加工具说明 Save the memory curation operations. 和提交指引 Submit the result using memory_curate.。记忆宪法原文保留。 | 保留去重、合并、退役、范围调整、使用信号参考和语言要求，按 x 架构提交后台操作。 |
+| P58 调度、输入与记录 | 修改/退役已有记忆或 overlap/conflict 触发项目分片整理，默认最短间隔 180000ms；原版另有全库空闲轮巡、分片游标和跨项目晋升候选。 | 信号与实际已有记忆变更触发整理，默认间隔沿用 180000ms，重复请求合并；当前按会话已选范围整批提供候选，附原要求的年龄、更新时间、注入/召回、来源和版本深度。恢复用户来源、退役原因、版本和使用记录；失败保留待整理标记，继续会话时重试。监控单列 curation，复用后台模型配置。 | 让恢复的提示词对应可执行能力，并适配当前存储和三档记忆范围。原版全库空闲轮巡、分页游标与跨项目晋升候选尚未迁入，保留为后续审核差异。 |
+
+任务部分的主动简化已撤回，验证入口独立，三类收尾提醒已恢复；本轮记忆整理原句、信号和对应作业已接回。P58 的剩余整理调度差异，以及 D12–D16 的任务补注文档、阶段结束信号和语义检索等删减，仍待后续逐段核对。
 
 ## 现在的组成
 
@@ -160,6 +171,7 @@
 | 动态上下文 | 用户选定范围内的记忆、工作状态、用户消息、工具结果，以及恢复的三类任务收尾提醒 |
 | 工具 schema | DSH 原生工具 + note/recall + todo_write + verify_link |
 | 记忆与状态后台 | 原记忆宪法 + 两区规则 + save_context 工具 |
+| 记忆整理后台 | 原记忆宪法 + CURATE_RULES 全文 + memory_curate 工具；由信号或已有记忆变更触发 |
 | 上下文整理后台 | 原手术刀提示词，输出普通文字工作纪要 |
 
 ## 核验
@@ -169,3 +181,5 @@
 使用用户授权的 DeepSeek v4 flash 进行了真实文件读写、技能加载、按需子代理与后台记忆联调。联网搜索需要另行配置宿主搜索提供方；本轮未把 Ark 模型密钥当作搜索凭据。
 
 收尾提醒恢复通过真实 DSH 的回合循环验证：本地模型端点分别在任务未完成、已勾选但无证据、仅文字证据时尝试结束；三类原文均实际进入下一次模型请求，复核成功后不重复追问。另覆盖静默持久化、重新挂接、新旧链接区分、写入失败、取消和计划模式；随后执行真实测试命令并验证跨轮证据恢复。
+
+记忆整理恢复通过真实 DSH 与本地模型端点联调：save_context 返回 overlap 后自动请求 memory_curate，并实际退役预置重复记忆。针对性测试覆盖原文一致性、合并与历史、false/conflict 信号、实际更新触发、记忆范围、最短间隔、并发用户编辑、用户来源继承、层级移动、失败及取消。
