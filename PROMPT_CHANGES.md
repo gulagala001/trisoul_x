@@ -1,8 +1,8 @@
 # 提示词改动对照
 
-基准：原 trisoul 提交 `4189f90305e545dbb82654f561fc4d83eed96d03`。原文快照在 [prompt-origin.json](test/fixtures/prompt-origin.json)，新版实际文本在 [prompts.mjs](src/prompts.mjs)、[dsh-agent.mjs](src/dsh-agent.mjs)、[hub.mjs](src/hub.mjs) 、[tasks.mjs](src/tasks.mjs) 和 [canvas.mjs](src/canvas.mjs)。表中“删除”指不迁入新版，不修改原项目。
+基准：原 trisoul 提交 `4189f90305e545dbb82654f561fc4d83eed96d03`。原文快照在 [prompt-origin.json](test/fixtures/prompt-origin.json)，新版实际文本在 [prompts.mjs](src/prompts.mjs)、[dsh-agent.mjs](src/dsh-agent.mjs)、[hub.mjs](src/hub.mjs)、[tasks.mjs](src/tasks.mjs)、[todolist.mjs](src/todolist.mjs) 和 [canvas.mjs](src/canvas.mjs)。表中“删除”指不迁入新版，不修改原项目。
 
-原则：保留原句，融合重复职责；删除不适配新架构的要求与事实假设。模型提示词只描述现有能力，不补写“没有某机制”的解释；note 用于按需记录，不承接旧交稿中的思维摘要要求。不以“精简”为由重写仍然适用的行为规则。
+原则：尽量保持原版，保留原句与通用能力；只融合职责并调整架构不兼容的协议，以及用户逐段审定的改动。模型提示词只描述现有能力，不补写“没有某机制”的解释；note 用于按需记录，不承接旧交稿中的思维摘要要求。不以“精简”为由重写仍然适用的行为规则。
 
 ## 三官融合：保留哪些原句
 
@@ -11,10 +11,10 @@
 | M01 | 对齐第 1 段：Read the user's actual words closely… | 整段逐字保留。 | 对齐任务范围仍然是主模型职责。 |
 | M02 | 博识第 1 段：Treat your own memory as unreliable… | 整段逐字保留。 | 查证与不确定性表达仍然适用。 |
 | M03 | 三官 When you have enough information to act… 段 | 选博识完整段，含共同句和 Note the difference… 补充，原句不改。 | 一位执行者不必重复三次同一组行动规则；知识核实补充保留。 |
-| M04 | 三官 You are operating autonomously… 段 | 选博识完整段，删除 P21 所列非实时交互假设；其余原句保留，包括 Gathering missing information… 补充。 | 融合重复；当前页面支持实时观看，不再假定用户不在场。 |
+| M04 | 三官 You are operating autonomously… 段 | 选博识完整段，逐字保留，包括用户不在场的假设和 Gathering missing information… 补充。 | 融合重复；按用户逐段核对意见保留原自主执行设定。 |
 | M05 | 三官 Exception: when the user is describing a problem… 段 | 先保留对齐完整段，再追加博识、实证各自的独有尾句，逐字保留。 | 咨询时只交付评估，以及评估须标明证据与推测，三者合并。 |
 | M06 | 三官 Before ending your turn… 段 | 保留对齐完整段；再追加实证的 "Complete" means verified… 原句。 | 保留完成范围与真实验证的行为标准；不实现程序收官闸门。 |
-| M07 | 三官 Before running a command that changes system state… 段 | 选博识完整段，包含 the failure you remember is a hypothesis…；原句不改。 | 保留根据现场证据行动的要求。 |
+| M07 | 三官 Before running a command that changes system state… 段 | 采用对齐／实证共同版本；删除博识官的扩写，具体原文见 P37。 | 2026-09-09 用户逐段核对后要求删除该补充。 |
 | M08 | 三官 For actions that are hard to reverse… 段 | 选实证完整段，保留原授权边界、诚实报告及 verified 定义。 | 保留已有提示词，未新增安全门、审批系统或验证工具。 |
 | M09 | 每魂的身份与工具分配 | 改为一个主模型共享普通工具；不再注入魂名与专属官位工具块。 | 多魂和私有取证循环已经移除。 |
 
@@ -24,7 +24,7 @@
 | --- | --- | --- | --- |
 | P01 主身份 | 宿主身份 + 每魂 persona | You are trisoul_x. | DSH 插件的主执行者名称；行为主体仍来自三官原文。 |
 | P02 原生工具协议 | submit_draft 是唯一交付渠道；直调普通工具会丢弃；动作填执行栏。首版另加：Use native tool calls directly. There are no draft submissions, votes, private lookup tools or execution fields. Working notes are optional; use note when useful, without a required envelope. | 整段删除，不再注入主提示词。 | 旧交付机制已删除，无需再向模型解释它们不存在；可用工具由实际工具定义提供。 |
-| P03 用户回复 | The prose delivered to the user for this step. Empty only when the execution fields carry entries — the executed actions are themselves the output. A submission with nothing queued to execute closes the turn, and this field is then the complete answer: open with the outcome itself — the sentence the user would ask for as the TLDR — then supporting detail; say plainly what remains unverified — never close on an in-progress sentence, and if a check still needs to run, queue it in the execution fields instead; nothing load-bearing may live only in findings. | When you finish the turn, your prose is the complete answer: open with the outcome itself — the sentence the user would ask for as the TLDR — then supporting detail; say plainly what remains unverified — never close on an in-progress sentence, and if a check still needs to run, run it with tools first. | 保留完整回复、结果优先和如实说明验证状态的原句；执行栏改为实际工具执行，删除 findings / 工作笔记与最终回复的旧绑定。 |
+| P03 用户回复 | The prose delivered to the user for this step. Empty only when the execution fields carry entries — the executed actions are themselves the output. A submission with nothing queued to execute closes the turn, and this field is then the complete answer: open with the outcome itself — the sentence the user would ask for as the TLDR — then supporting detail; say plainly what remains unverified — never close on an in-progress sentence, and if a check still needs to run, queue it in the execution fields instead; nothing load-bearing may live only in findings. | 整段删除，包括从 output 改写而来的 REPLY_GUIDE 常量及其主提示词注入。 | 2026-09-09 用户逐段核对后要求直接删除 output；撤回之前将其改写为独立回复指导的处理。 |
 | P04 findings 迁移 | What you newly established this step — what you observed, what the results told you. Written as yourself mid-task, not a reporter summarizing someone else: open on the finding — 'Turns out …', 'Looking at `server.js`, …'. Code entities in backticks; error messages and measured values verbatim. Facts land once, in the step that established them — never retell earlier findings or restate the task. Empty when nothing new has come in yet (e.g. the first step, before any results). Prose only, no lists. | 删除整段，不作为 note 的说明。 | 这是旧交稿的逐步摘要、叙述人称和格式要求；按需工作笔记无需复述每一步观察。 |
 | P05 plan 迁移 | How you'll proceed after this step, at whatever depth you've actually thought it through — when you've already settled the design, write it out in full, key code included: thinking not recorded here is gone when the step ends. No need to re-paste code that ships in files/edits this step. Only what you newly settled or changed; empty when the plan you already recorded still stands — never pad. | 删除整段，不作为 note 的说明。 | 原生会话保留上下文，不再要求每步重述思考和方案；原 files/edits 字段指代也随整段删除。 |
 | P06 工作笔记入口 | 四格 findings、plan 每步交稿。首版入口：Save a working note when useful; this is optional, not a delivery channel. 参数：The working note, in ordinary prose | Save a useful fact, decision, or unfinished plan for later work. 参数 text：Note content | 仅说明笔记可以保存什么；去掉交付渠道对比、每步摘要和文体限制。 |
@@ -35,14 +35,14 @@
 | P11 历史回捞参数 | call trisoul_recall with {"query":"what you need","seqRange":{"start":lo,"end":hi}} | call recall with {"query":"what you need","from":lo,"to":hi} | 对应新版工具名称与扁平参数；工作记录头另有 P23 修正。 |
 | P12 read.limit | 原宿主：Maximum number of lines to return. Defaults to ${caps.limit}. 首版独立原型改为 Omit to read to the end. | 恢复 DSH 原生参数描述与实际读取上限：Maximum number of lines to return. Defaults to ${caps.limit}. | 文件读取已交回 DSH，描述随宿主实际配置生成。 |
 | P13 bash 工具 | 首版只留下执行命令、全新 shell、workdir 与退出码说明。 | 恢复 DSH 原生 `tool:bash` system 段和 bash schema，包括环境、超时、输出落盘与后台作业说明。 | 对应宿主已经提供的真实能力；不再维护简化版命令执行器。 |
-| P14 任务工具 | 原 task_map 定义与锚点、todo 完成标记、verify_link 验证关联分为三个工具；独立原型先合为 tasks(items)。 | 一个 `todo_write(todos)`：每条记录有 content、status、可选 source、verification.method / result。任务原文纪律与验证原文融合到同一工具说明。 | 任务定义、进展和验证属于同一条记录；去掉跨工具关联与转交，细项见 P33–P36。 |
+| P14 任务工具 | 原 task_map 定义与锚点、todo 完成标记、verify_link 验证关联分为三个工具。 | 移植原 todolist.mjs 的数据结构与操作；统一注册 todo_write，op 合并 excerpt/add/edit/remove/check/link/run/unlink/view/transcript。 | 按用户要求合并入口；撤回此前整表覆盖、可选 source、自由 verification 字符串的简化。 |
 | P15 web_fetch | 首版把 Fetch the content… 与 Cite the URL… 合成 description。 | 恢复 DSH 的 web_fetch 工具说明与独立 `tool:web-fetch` system 段；web_search 由宿主同时注册。 | 原先的分层指导恢复，网页格式转换、检索与引用说明跟随真实宿主工具。 |
 | P16 recall | 原 trisoul_recall 的两通道说明；范围固定写 global + cross-project + this project，回捞用 seqRange。 | 原句主体保留；范围改为 scoped to this session’s selected memory range；原文参数改为 {from:a,to:b}，工具名 recall。scope 参数的 everything visible to this project 改为 everything visible to this session。 | 支持用户在输入区选择的三种记忆范围，不能再承诺每个会话都有全局记忆；参数对齐新工具。 |
 | P17 环境与项目指令 | 首版只有 Working directory / Platform / Today 三行。 | 恢复 DSH 环境、时间、项目指令、技能目录及运行时上下文层。 | 原型缺少的通用能力由宿主提供；当前目录、日期和项目指令根据会话生成。 |
 | P18 用户语言 | 原软路线 output 纪律：respond in the user's language | Respond in the user's language. | 从被删除的交稿纪律迁到主提示词。 |
 | P19 文件工具指导的摆放 | 原宿主 tool:read / tool:write / tool:edit 独立 system 段；首版合入 description。 | 恢复原生工具 schema + 独立 system 段；write/edit 仅删 P20 的括号。 | 恢复 trisoul 原有分层，实际读写能力复用 DSH。 |
 | P20 文件操作的宿主政策指代 | (the default fs-observation-policy requires it) | 删除这个括号，保留“先读取已有文件”“优先定点修改”等其余原句 | 该宿主政策未迁入，不能继续声称代码有此硬要求；不增加检查闸门。 |
-| P21 自主执行的交互假设 | The user is not watching in real time and cannot answer questions mid-task, so asking 'Want me to…?' or 'Shall I…?' will block the work. | 删除这一句，其余自主执行规则保留。 | 当前对话和工具结果实时显示；是否自主行动取决于任务授权，不需要假定用户无法观看。 |
+| P21 自主执行的交互假设 | The user is not watching in real time and cannot answer questions mid-task, so asking 'Want me to…?' or 'Shall I…?' will block the work. | 原文恢复，放在 You are operating autonomously. 之后。 | 2026-09-09 用户逐段核对时明确要求保留；撤回此前基于界面实时交互能力作出的删除。 |
 | P22 记忆整理作业指代 | duplication is acceptable (the curation job cleans it up), wrongful merging is not | duplication is acceptable, wrongful merging is not | 独立 curation 作业未迁入，不能承诺后续自动清理；宁重复勿误并等原规则保留。 |
 | P23 工作记录恢复说明 | treat it as done and continue; don't redo or restate it. | continue from the recorded progress and carry forward unfinished work. | 压缩记录本来就包含 Not yet done，不能笼统地把整份记录都当成已完成。 |
 
@@ -50,7 +50,7 @@
 
 | 编号 | 原位置 / 内容 | 新版处理 | 原因 |
 | --- | --- | --- | --- |
-| D01 | submitDraftToolSchema / draftJsonSchema 中四格及 actions/files/edits/lookup 格式契约 | 删除整稿 schema；output 的回复规则按 P03 迁移；findings/plan 不再作为 note 的写作要求。 | 原生工具循环直接执行动作，按需笔记无需承担旧交稿职责。 |
+| D01 | submitDraftToolSchema / draftJsonSchema 中四格及 actions/files/edits/lookup 格式契约 | 删除整稿 schema；output 说明及其改写版按 P03 删除；findings/plan 不再作为 note 的写作要求。 | 原生工具循环直接执行动作，按需笔记无需承担旧交稿职责。 |
 | D02 | submitFormatBlock、submitFirstOrder、evidenceReturnOrder、draftDiscipline | 删除格式教学、交稿直令与内层取证直令。 | 主循环直接消费原生工具结果。 |
 | D03 | jsonFormatBlock / response_format / text.format 输出锁 | 删除。 | 新版本不依赖整篇回复的结构锁。 |
 | D04 | 缺封皮的 mend / 代填指令 | 删除。 | 不再存在缺封皮状态。 |
@@ -58,8 +58,8 @@
 | D06 | tipsMessage：parallel timelines / never delivered | 删除。 | 不存在未执行的败者时间线。 |
 | D07 | toolClassesHint、officerHint、DEDICATED_BLURBS | 删除工具阶层与官位排他说明；知识查证原则保留在博识原文。 | 所有主模型工具走同一循环。 |
 | D08 | ENVELOPE_DESC.action：固定 -ing 当前动作句 | 删除独立动作栏格式要求。 | 没有独立 action/move 栏；不是改写自然回复风格。 |
-| D09 | verify_link 独立操作、I4 未完成弹回、I6 文字复核、I7 证据分型旁白 | 删除独立验证工具和程序收官闸门；验证方法与证据质量原文迁入统一任务工具。 | 用户要求把验证合入任务；证据记录与任务状态一起维护。 |
-| D10 | TODO_NUDGE / TODO_EMPTY_NUDGE | 不注入官位专属提醒；原任务使用场景与完成标准并入 todo_write 的 description。 | 对齐官已融合为主执行者，清单由宿主提供。 |
+| D09 | verify_link 独立入口、I4 收官弹回、I6 追问与I7旁白 | 验证操作与描述已恢复并合入 todo_write；完成态与证据分类保留，未恢复投票/独走收官流程。 | 保留原任务验证能力，适配单主模型运行方式。 |
+| D10 | TODO_NUDGE / TODO_EMPTY_NUDGE | 恢复原文软提醒，面向单主模型；空清单提醒里的 task_map 改成 todo_write。 | 保留新指令更新任务、复杂任务漏建清单的提醒；仅适配工具名和调用对象。 |
 | D11 | CURATE_RULES / CURATE_FORMAT_TAIL 与 signals.overlap/conflict | 不迁入独立周期整理作业；删除未使用的 overlap/conflict 文案常量；OPS_DESC 中旧作业指代按 P22 删除。 | 现有消化作业维护条目，保留同一件事更新、宁重复勿误并等规则。 |
 | D12 | DIGEST_DESC.workdoc | 不迁入独立任务补注文档视图，并删除未使用的文案常量；当前工作状态由 status 维护。 | 避免同时维护两份重叠的会话工作状态。 |
 | D13 | DIGEST_DESC.phaseClosed | 不迁入整段阶段放行信号，并删除未使用的文案常量；compactable / nowCompactable 原文保留。 | 按区间释放即可，不增加另一个放行通道。 |
@@ -80,7 +80,7 @@
 | 手术刀 system | 全文逐字保留 Done / Errors / Decisions / Not yet done 与原先的英文、引用纪律；合并原检查点的说明保留。 |
 | 长期记忆开场头、工作状态版本头 | 原句主体保留；开场层级按已选范围显示，状态带实际事件序号。 |
 | read/write/edit | DSH 当前工具 schema 与独立提示层；只删除失效政策括号（P20）。 |
-| todo_write 的完成标准 | 原 todo 的真实完成、失败不得勾选、发现未完成要取消勾选等原句保留；没有把它实现成硬闸门。 |
+| todo_write 的完成标准 | 原 todo 完成纪律逐字保留，仅 draft 改 reply；编辑任务自动取消勾选并清除验证链接。 |
 
 ## 本轮 DSH 适配补充
 
@@ -88,8 +88,8 @@
 
 | 编号 / 部分 | 适配前 | 现在 | 原因 |
 | --- | --- | --- | --- |
-| P24 身份层 | 自己拼接一份 system 字符串 | `trisoul-x:persona`：身份 + 三官融合原文 + REPLY_GUIDE + 用户语言；由 DSH 注册和排序 | 恢复原分层；正文不再另写。 |
-| P25 通用工具层 | 8 个自写工具，部分说明合并 | DSH 原生文件、搜索、Shell、后台作业、技能、目标、用户提问、网页、按需子代理与工作流；插件提供 note、recall 和融合后的 todo_write | 通用执行复用 DSH；任务工具扩展为任务与验证的统一记录。 |
+| P24 身份层 | 自己拼接一份 system 字符串 | `trisoul-x:persona`：身份 + 三官融合原文 + 用户语言；由 DSH 注册和排序 | 恢复原分层；output 改写版 REPLY_GUIDE 按 P03 删除。 |
+| P25 通用工具层 | 8 个自写工具，部分说明合并 | DSH 原生通用工具 + note/recall；原任务、勾选、验证操作合成一个 todo_write | 保留通用执行能力与原任务结构。 |
 | P26 工具层中的失效括号 | DSH 默认 write/edit 仍提到已禁用的 fs-observation-policy | 组装时仅删除 ` (the default fs-observation-policy requires it)`，其余原生段落保持 | 延续 P20，避免向模型陈述不存在的强制行为。 |
 | P27 按需子代理 | 独立原型未实现 | 恢复 DSH 的 subagent / subagent_fork / 查询、等待、发送与停止工具及原生说明 | 用户明确选择“保留，按需调用”；无固定三模型编队。 |
 | P28 技能与项目上下文 | 独立原型未加载 | DSH 的 agent-instructions、skill-filesystem、tool-skill 按会话加载 | 原 trisoul 通用能力的一部分，不能以简化为由漏掉。 |
@@ -100,25 +100,31 @@
 
 | 编号 / 部分 | 原文 / 旧机制 | 新文 / 处理 | 原因 |
 | --- | --- | --- | --- |
-| P33 需求锚点 | Creates and edits the todo list anchored to the user's own wording；excerpt、anchor 的 from/to 和 msg；单独 op:transcript/view | 保留首句与原任务使用纪律；`source` 保存相关用户原话，直接随任务记录一起提交 | 用户原始消息仍在 DSH 会话中；取消独立摘录表与跨表锚点，用同一任务中的原话保留需求依据。 |
-| P34 验证时机 | When to link: link the evidence the moment a task is done — not in one sweep after everything is built. | When to record: record the verification result the moment a task is done — not in one sweep after everything is built. | 证据写回当前任务的 verification.result；仅把独立“关联”动作改成任务内记录。 |
-| P35 验证纪律 | How a test earns its place…、What does not count… 两段；Evidence ranks… | 前两段逐字保留。证据层级段只改 Link the highest rung → Record the highest rung，reason must say why → the result must say why，其余原文保持 | 保留从需求推导验证、真实路径、证据质量与如实说明的原则；适配新的存储字段。 |
-| P36 验证工具协议 | A task counts as verified only through what is linked here；独立 op:link/run/unlink/view、自动按文件扩展名执行测试 | 删除独立关联协议与“只有经过此工具才算验证”的定义。新增接口说明：Send the complete list in todos. Each task carries its own status, source wording, and verification method/result. Run checks with the available execution tools and record their observed results on the same task. When a task changes, update its status and verification to match the revised task. | 一个任务工具统一更新；执行仍用普通工具；验证未记录时页面如实显示，不设置自动拒绝完成或另一个验证循环。 |
+| P33 需求锚点 | excerpt / anchor 的 from/to、msg、摘录 ID，以及独立 transcript/view | 恢复原摘录表与任务锚点、引用定位、歧义消解和 transcript/view；新任务必须带 anchor。 | 用户指出可选 source 削弱了需求溯源，要求尽量保持原版；原引用语义完整迁回。 |
+| P34 验证时机 | When to link: link the evidence the moment a task is done — not in one sweep after everything is built. | 全句逐字恢复。 | 验证链接操作已恢复，并入统一任务工具。 |
+| P35 验证纪律 | How a test earns its place…、What does not count…、Evidence ranks… | 原三段逐字恢复，包括 Link the highest rung 和 reason must say why。 | test/text 链接及 reason 字段已恢复，不再需要改成泛化结果备注。 |
+| P36 验证工具协议 | verify_link 的 link/run/unlink/view 与真实测试执行 | 描述全文恢复；link/run/unlink/view 合入 todo_write。测试链接仍按 cmd 或文件扩展名真实执行，保留 PASS/FAIL/TIMEOUT，停止不覆盖旧结果。 | 用户要求实证官工具一起合体；撤回只记录自由文本结果的实现。 |
+| P37 系统状态变更前的博识补充 | — the failure you remember is a hypothesis about this one, not a diagnosis; confirm the current state by looking at it before you act on the resemblance. | 删除这段扩写，前句恢复为 A signal that pattern-matches to a known failure may have a different cause. | 补充来自原 trisoul 博识官，不是新增文本；2026-09-09 按用户逐段核对意见删除。 |
+| P38 任务入口必要适配 | To check tasks off, use the todo tool；独立 todo 的 updates/remove 参数 | To check tasks off, use op:check；新增连接句 op:check updates completion.；updates/remove 参数原样保留。 | 原来靠工具名区分完成态操作，现在用同一工具的 op 区分。 |
+| P39 冲突参数合并 | task_map.tasks 是任务对象数组；verify_link.tasks 是运行目标 ID 数组。remove/unlink 都使用 ids。 | tasks 按 op 接受原任务对象或任务 ID；说明直接连接两份原文。ids 描述同时说明 remove 的任务 ID 与 unlink 的证据 ID。 | 保持原参数名和请求形态，用 op 区分语义。 |
+| P40 任务快照 | 原 [todo list] 注入及换代、稳定 E/T/L ID、两态勾选 | 恢复原数据与注入；适配 DSH V3 的 snapshotEvents 与消息构造，原生清单读取同一 todo/write 事件。 | 保留跨轮任务状态和原文/证据关系。 |
+
+本轮已撤回任务部分的主动简化。记忆整理、任务补注文档、阶段结束信号和语义检索中此前的删减仍列在 D11–D16，尚未逐段审定；它们是当前实现与原版的差异，不应把“最小化”当作用户已经认可这些删减的理由。后续按同一原则逐段核对。
 
 ## 现在的组成
 
 | 层 | 来源与职责 |
 | --- | --- |
-| 主身份与行为 | 三官原文融合 + 完整回复纪律 + 用户语言 |
-| 通用 system 段 | DSH 工具使用指导、环境与能力；任务和验证纪律合入统一 todo_write 工具 |
+| 主身份与行为 | 三官原文融合（含用户逐段核对的调整）+ 用户语言 |
+| 通用 system 段 | DSH 使用指导与环境；原 task_map、todo、verify_link 描述合并到统一任务工具 |
 | 项目与技能 | DSH 按当前目录和会话发现、加载 |
 | 动态上下文 | 用户选定范围内的记忆、工作状态、用户消息和工具结果 |
-| 工具 schema | DSH 原生工具 + note / recall + 含验证字段的 todo_write |
+| 工具 schema | DSH 原生工具 + note/recall + 原任务/验证操作合并后的 todo_write |
 | 记忆与状态后台 | 原记忆宪法 + 两区规则 + save_context 工具 |
 | 上下文整理后台 | 原手术刀提示词，输出普通文字工作纪要 |
 
 ## 核验
 
-自动测试对照原文快照检查主提示词、TASK_GUIDE 原任务纪律、TASK_VERIFY_GUIDE 原验证纪律、记忆宪法、OPS_DESC 和手术刀原文；使用真实 DSH 加载插件、原生工具和本地模型端点，验证自然语言输出、项目指令、技能目录、记忆注入、范围绑定、V3 整理与回捞、任务与验证同一记录及跨轮恢复。原文快照仅用于对照测试，不参与运行时加载。
+自动测试对照原文快照检查主提示词、原 task_map/todo/verify_link 全文（仅必要的工具名与 draft→reply 适配）、记忆宪法、OPS_DESC 和手术刀原文；使用真实 DSH 加载插件、原生工具和本地模型端点，验证自然语言输出、项目指令、技能目录、记忆注入、范围绑定、V3 整理与回捞、任务与验证同一记录及跨轮恢复。原文快照仅用于对照测试，不参与运行时加载。
 
 使用用户授权的 DeepSeek v4 flash 进行了真实文件读写、技能加载、按需子代理与后台记忆联调。联网搜索需要另行配置宿主搜索提供方；本轮未把 Ark 模型密钥当作搜索凭据。
