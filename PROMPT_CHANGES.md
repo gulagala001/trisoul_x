@@ -249,3 +249,11 @@ P79 新增工具说明原文：
 | --- | --- | --- | --- |
 | P81 验证工具参数说明 | `without cmd the file is run bare by its extension (node / pytest / bash)}` | `without cmd the file is run bare by its extension (node / pytest / bash / pwsh)}. Custom cmd runs in PowerShell on Windows and bash elsewhere.` | 用户要求 Windows 可用；新增 .ps1 运行器，自定义命令在 Windows 使用 PowerShell，与宿主原生 Shell 保持一致。原验证纪律全文保留。 |
 | P82 未知验证文件的运行提示 | `or link a .js/.mjs/.cjs/.py/.sh file.` | `or link a .js/.mjs/.cjs/.py/.sh/.ps1 file.` | 将已支持的 PowerShell 文件加入回执提示。主系统提示词不变。 |
+
+## 2026-09-10 BT 收尾提醒开关
+
+| 编号 / 部分 | 调整前 | 调整后 | 原因 |
+| --- | --- | --- | --- |
+| P83 待办提醒的任务行 | `[todo list] Unresolved tasks remain:`，列出未完成或缺证据任务，并附证据缺口。 | 标题原文保留；验证提醒关闭时，只列未完成项的 ID、勾选状态与标题，省去证据缺口。两个提醒都开启时保持原文。 | 用户要求待办与验证提醒可独立开关；关闭验证后，待办提醒不应继续要求补验证。 |
+| P84 单独开启验证时的标题 | `Every task is checked off, but these lack qualifying evidence:` | 全部已勾选时原文保留；尚有未勾选任务时用 `These tasks lack qualifying evidence:`，正文只列缺少合格证据的任务，结尾原文保留。 | 单独开启验证提醒时，也可能存在未勾选任务；避免错误声称全部已完成。 |
+| P85 三类收尾提醒的触发 | 默认全部开启。 | BT 按会话保存选择：待办默认开启；缺证据提醒和文字证据复核共同受验证开关控制，默认关闭。 | 用户明确指定默认值和模型旁的 BT 入口；主系统提示词、工具说明、任务与证据记录均不改。 |
