@@ -229,3 +229,16 @@
 | P78 三档触发间隔（运行配置，提示词不变） | 状态阈值 6 / 10 / 15 条事件，压缩间隔 3 / 6 / 10 步，最小区间 10k / 20k / 40k Token；消化默认 8 条，记忆文档默认 10 步，与档位独立。 | 状态 30 / 60 / 90 条、压缩 10 / 20 / 30 步、区间 20k / 40k / 80k；档位联动消化 16 / 32 / 48 条、文档 20 / 30 / 45 步；默认适中。 | 用户检查实际会话后要求三个档位整体上调。减少状态、记忆文档和后台整理的更新频率；页面明确区分事件与模型步骤，前后端使用同一份档位定义。 |
 
 验证：49 项测试通过，前端构建通过；浏览器切换三个档位后恢复中档，确认无未保存改动。当前实例通过设置 API 热更新至中档，运行中的会话继续执行；任务重发规则和旧快照清理设置保持不变。
+
+## 2026-09-10 DSH 0.1.5-rc.1 适配
+
+| 编号 / 部分 | 调整前 | 调整后 | 原因 |
+| --- | --- | --- | --- |
+| P79 原生文件交付工具 | trisoul_x 的 Agent preset 没有 present。 | 跟随新版 standard preset 加入 @deepseek-ai/dsh-tool-present，工具参数和说明由宿主原样提供，见下方原文。 | 用户要求升级 3083 的 DSH；接入候选版文件交付与右侧栏预览能力，不新增自定义协议。 |
+| P80 宿主与官方模型目录 | DSH 相关直接依赖固定 0.1.5-alpha.1；当前官方模型列表有用户添加的临时型号。 | DSH、compaction、llm、session 同步固定 0.1.5-rc.1；当前目录补入新版默认模型 deepseek-flash，采用上游的文字/图片、100 万上下文和 systemPromptUpdate: in-history 配置。已有模型条目、密钥和模型选择保持。 | 自定义 models 数组会覆盖宿主默认目录，因此需要补入新条目才能在本实例的模型选择器中看到它；模型能力声明来自上游配置。主提示词和已有工具说明未手改。 |
+
+P79 新增工具说明原文：
+
+> Declare existing files accessible through the Session filesystem as final deliverables. When a file you create or update is an output the user asked to receive, you must call present after writing it and before your final response, including files created through Bash or code execution. Mentioning its path in your reply does not replace this call. The files must already exist. The user opens the current source files; their contents are not copied or preserved.
+
+验证：rc.1 下 49 项测试通过；真实 DSH 与本地模型端点完成 present 调用并收到 Presented fixture.txt。3083 重启后核对已有会话任务、记忆条目、配置和密钥；浏览器验证长会话恢复、模型目录、右侧监控与统计，页面无错误日志。重启前已确认会话全部空闲，升级前配置和依赖清单保存在本项目忽略的 data/backups/ 下。
