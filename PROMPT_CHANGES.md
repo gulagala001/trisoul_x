@@ -242,3 +242,10 @@ P79 新增工具说明原文：
 > Declare existing files accessible through the Session filesystem as final deliverables. When a file you create or update is an output the user asked to receive, you must call present after writing it and before your final response, including files created through Bash or code execution. Mentioning its path in your reply does not replace this call. The files must already exist. The user opens the current source files; their contents are not copied or preserved.
 
 验证：rc.1 下 49 项测试通过；真实 DSH 与本地模型端点完成 present 调用并收到 Presented fixture.txt。3083 重启后核对已有会话任务、记忆条目、配置和密钥；浏览器验证长会话恢复、模型目录、右侧监控与统计，页面无错误日志。重启前已确认会话全部空闲，升级前配置和依赖清单保存在本项目忽略的 data/backups/ 下。
+
+## 2026-09-10 Windows 插件安装适配
+
+| 编号 / 部分 | 调整前 | 调整后 | 原因 |
+| --- | --- | --- | --- |
+| P81 验证工具参数说明 | `without cmd the file is run bare by its extension (node / pytest / bash)}` | `without cmd the file is run bare by its extension (node / pytest / bash / pwsh)}. Custom cmd runs in PowerShell on Windows and bash elsewhere.` | 用户要求 Windows 可用；新增 .ps1 运行器，自定义命令在 Windows 使用 PowerShell，与宿主原生 Shell 保持一致。原验证纪律全文保留。 |
+| P82 未知验证文件的运行提示 | `or link a .js/.mjs/.cjs/.py/.sh file.` | `or link a .js/.mjs/.cjs/.py/.sh/.ps1 file.` | 将已支持的 PowerShell 文件加入回执提示。主系统提示词不变。 |
