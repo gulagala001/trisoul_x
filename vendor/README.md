@@ -1,7 +1,7 @@
 # OpenCU distribution
 
-This is the unmodified OpenCU 1.0.0 package built from [gulagala001/opencu](https://github.com/gulagala001/opencu), commit `0928566bb85dca34c2a1bf810ecdc53ef2af8091`. Computer Use source is maintained only in that repository.
+`opencu/` contains the unmodified OpenCU 1.0.0 distribution from [gulagala001/opencu](https://github.com/gulagala001/opencu), commit `2b6ab8cc6369e8c0c48100cdd3486d9a263cee03`. Source is maintained only in that repository. Do not edit this generated copy.
 
-The package is bundled because DSH/pnpm blocks GitHub dependencies inside installed plugins. The local package dependency preserves one-command installation without changing the host package policy.
+The distribution is included directly because DSH/pnpm blocks GitHub subdependencies and requires installation-time preparation for git packages with local package dependencies. Oh My DSH uses Node package imports to load this copy and declares its runtime dependencies directly; users retain one-command installation without changing package-manager policy.
 
-SHA-256: `4fd3b87bc9408f1b4732fce9f7aa7b37775cc431a8ce00c17fb4423c4edf95ef`.
+`opencu.json` records the source, archive checksum and SHA-256 of every distributed file. Updates replace the whole distribution from an OpenCU release archive and regenerate that manifest. The original package metadata and third-party notices remain included.

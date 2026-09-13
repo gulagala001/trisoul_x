@@ -28,7 +28,12 @@
     "test": "node --test test/*.test.mjs"
   },
   "dependencies": {
-    "opencu": "file:vendor/opencu-1.0.0.tgz",
+    "diff": "9.0.0",
+    "html-to-text": "10.0.1",
+    "marked": "18.0.12",
+    "playwright": "1.63.0",
+    "sharp": "0.35.4",
+    "ws": "8.21.3",
     "zod": "4.5.4"
   },
   "engines": {
@@ -98,5 +103,10 @@
     "@deepseek-ai/schemastery": {
       "optional": true
     }
+  },
+  "imports": {
+    "#opencu/integration": "./vendor/opencu/src/integration.mjs",
+    "#opencu/client-source": "./vendor/opencu/src/client/computer-use.jsx",
+    "#opencu/*": "./vendor/opencu/*"
   }
 }

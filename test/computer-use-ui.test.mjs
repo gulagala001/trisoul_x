@@ -1,4 +1,4 @@
-import { browserExecutablePath } from 'opencu/src/computer-use/browser.mjs';
+import { browserExecutablePath } from '#opencu/src/computer-use/browser.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createServer } from 'node:http';
@@ -11,8 +11,8 @@ import { chromium } from 'playwright';
 import sharp from 'sharp';
 import { startFixture } from './fixtures/computer-use/server.mjs';
 import { extensionFixture } from './fixtures/computer-use/extension.mjs';
-import { extensionSocketPath } from 'opencu/src/computer-use/extension-hub.mjs';
-import { viewportGeometry, sameScreenshotGeometry } from 'opencu/src/computer-use/browser-screenshot.mjs';
+import { extensionSocketPath } from '#opencu/src/computer-use/extension-hub.mjs';
+import { viewportGeometry, sameScreenshotGeometry } from '#opencu/src/computer-use/browser-screenshot.mjs';
 import { legacyBundle } from './fixtures/computer-use/native-runtime.mjs';
 import { testBrowserExecutable } from './fixtures/computer-use/test-browser.mjs';
 import { stopFixtureProcess } from './fixtures/process.mjs';

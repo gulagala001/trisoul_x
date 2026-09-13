@@ -5,7 +5,7 @@ import { CONTEXT_WINDOW_EXCEEDED_CODE } from '@deepseek-ai/dsh-llm';
 import { currentTasks, restoreTaskProjection } from './tasks.mjs';
 import { ensureSystemHead } from './system-head.mjs';
 import { join } from 'node:path';
-import { acquireComputerUse } from 'opencu/integration';
+import { acquireComputerUse } from '#opencu/integration';
 
 export { Config };
 export const name = 'trisoul-x';

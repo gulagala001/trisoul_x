@@ -24,6 +24,3 @@ data/
 /COMPUTER_USE_ASSESSMENT.md
 /PROMPT_CHANGES.md
 /WINDOWS_HANDOFF.md
-
-# Bundled, versioned OpenCU distribution required by DSH/pnpm.
-!/vendor/opencu-*.tgz
