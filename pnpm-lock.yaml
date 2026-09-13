@@ -8,24 +8,9 @@ importers:
 
   .:
     dependencies:
-      diff:
-        specifier: 9.0.0
-        version: 9.0.0
-      html-to-text:
-        specifier: 10.0.1
-        version: 10.0.1
-      marked:
-        specifier: 18.0.12
-        version: 18.0.12
-      playwright:
-        specifier: 1.63.0
-        version: 1.63.0
-      sharp:
-        specifier: 0.35.4
-        version: 0.35.4(@types/node@26.5.0)
-      ws:
-        specifier: 8.21.3
-        version: 8.21.3
+      opencu:
+        specifier: file:vendor/opencu-1.0.0.tgz
+        version: file:vendor/opencu-1.0.0.tgz(@deepseek-ai/cordis@4.0.2)(@deepseek-ai/dsh-llm@0.1.5-rc.1(@deepseek-ai/cordis@4.0.2))(@deepseek-ai/schemastery@3.18.2)(@types/node@26.5.0)
       zod:
         specifier: 4.5.4
         version: 4.5.4
@@ -51,12 +36,21 @@ importers:
       esbuild:
         specifier: 0.25.12
         version: 0.25.12
+      playwright:
+        specifier: 1.63.0
+        version: 1.63.0
       react:
         specifier: 18.3.1
         version: 18.3.1
       react-dom:
         specifier: 18.3.1
         version: 18.3.1(react@18.3.1)
+      sharp:
+        specifier: 0.35.4
+        version: 0.35.4(@types/node@26.5.0)
+      ws:
+        specifier: 8.21.3
+        version: 8.21.3
 
 packages:
 
@@ -3400,6 +3394,22 @@ packages:
       ws:
         optional: true
       zod:
+        optional: true
+
+  opencu@file:vendor/opencu-1.0.0.tgz:
+    resolution: {integrity: sha512-U0M0LeDCdDRyWFPD5ii2A8sbDjcDbGIMzCaPNHcnplhZOwsoKuUH75oIIXl8b/EtgE7eog+0Mk22Tw3fCWPdnA==, tarball: file:vendor/opencu-1.0.0.tgz}
+    version: 1.0.0
+    engines: {node: '>=22.19'}
+    peerDependencies:
+      '@deepseek-ai/cordis': 4.0.2
+      '@deepseek-ai/dsh-llm': 0.1.5-rc.1
+      '@deepseek-ai/schemastery': 3.18.2
+    peerDependenciesMeta:
+      '@deepseek-ai/cordis':
+        optional: true
+      '@deepseek-ai/dsh-llm':
+        optional: true
+      '@deepseek-ai/schemastery':
         optional: true
 
   p-retry@4.6.2:
@@ -7506,6 +7516,24 @@ snapshots:
     optionalDependencies:
       ws: 8.21.3
       zod: 4.5.4
+
+  opencu@file:vendor/opencu-1.0.0.tgz(@deepseek-ai/cordis@4.0.2)(@deepseek-ai/dsh-llm@0.1.5-rc.1(@deepseek-ai/cordis@4.0.2))(@deepseek-ai/schemastery@3.18.2)(@types/node@26.5.0):
+    dependencies:
+      diff: 9.0.0
+      html-to-text: 10.0.1
+      marked: 18.0.12
+      playwright: 1.63.0
+      sharp: 0.35.4(@types/node@26.5.0)
+      ws: 8.21.3
+      zod: 4.5.4
+    optionalDependencies:
+      '@deepseek-ai/cordis': 4.0.2(@deepseek-ai/cordis-plugin-include@1.0.7)(@deepseek-ai/cordis-plugin-loader@1.0.3)
+      '@deepseek-ai/dsh-llm': 0.1.5-rc.1(@deepseek-ai/cordis@4.0.2)
+      '@deepseek-ai/schemastery': 3.18.2
+    transitivePeerDependencies:
+      - '@types/node'
+      - bufferutil
+      - utf-8-validate
 
   p-retry@4.6.2:
     dependencies:
