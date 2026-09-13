@@ -11,9 +11,12 @@ test('Oh My embeds an unmodified OpenCU release with every runtime dependency', 
   assert.equal(pkg.name, 'opencu'); assert.equal(pkg.version, provenance.version);
   for (const [name, version] of Object.entries(pkg.dependencies)) assert.equal(own.dependencies[name], version, 'runtime dependency ' + name);
   const files = [];
+  // These derived caches are excluded from both Git and the release package.
+  const builds = new Set(['native/computer-use/windows/bin', 'native/computer-use/windows/obj', 'native/computer-use/windows/desktop/bin', 'native/computer-use/windows/desktop/obj']);
   const walk = async (directory, prefix = '') => {
     for (const entry of await readdir(directory, { withFileTypes: true })) {
       const path = prefix + entry.name;
+      if (builds.has(path)) continue;
       if (entry.isDirectory()) await walk(new URL(entry.name + '/', directory), path + '/');
       else { assert.ok(entry.isFile(), 'distribution contains no external symlink'); files.push(path); }
     }
